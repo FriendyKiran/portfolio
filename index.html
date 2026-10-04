@@ -1,0 +1,1139 @@
+<!DOCTYPE html>
+<!--
+  ==========================================================================
+  Kiran Babu Athina — Personal Portfolio
+  Single-file site: all CSS lives in <style>, all JS lives in <script>.
+
+  HOW TO EDIT
+  - Colors / fonts / spacing:  edit the CSS variables in the ":root" block.
+  - Light theme colors:        edit BOTH light blocks right below ":root"
+                              (system-light and toggle-light must match).
+  - Hero typing phrases:      edit the TYPING_PHRASES array in <script>.
+  - Content:                  every section is marked with a big comment
+                              banner (search for "SECTION:").
+  - Photo:                    "formal image.jpg" must sit next to this file.
+  ==========================================================================
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="dark light" />
+  <!-- Apply a saved theme choice before the page paints (prevents a flash).
+       No saved choice = follow the system theme. -->
+  <script>
+    try {
+      var t = localStorage.getItem("theme");
+      if (t === "light" || t === "dark") document.documentElement.setAttribute("data-theme", t);
+    } catch (e) {}
+  </script>
+  <title>Kiran Babu Athina | ML & AI Engineer</title>
+  <meta name="description" content="Kiran Babu Athina, Machine Learning and AI Engineer. Agentic RAG, LLM fine-tuning, multimodal models, and production ML pipelines." />
+
+  <!-- Inline SVG favicon (teal "K") so no extra file is needed -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230a0e17'/%3E%3Ctext x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-weight='700' font-size='36' fill='%2300d4ff'%3EK%3C/text%3E%3C/svg%3E" />
+
+  <!-- Font: Space Grotesk -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- Icons: Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" referrerpolicy="no-referrer" />
+
+  <style>
+    /* ======================================================================
+       1. DESIGN TOKENS — change the whole look from here
+       ====================================================================== */
+    /* THEMES
+       - Dark is defined in ":root" below.
+       - Light overrides it in two places that must stay identical:
+           (a) when the OS prefers light and the visitor hasn't forced dark
+           (b) when the visitor picks light with the toggle (data-theme="light")
+       - With no saved choice, the site follows the system theme. */
+
+    /* ---- DARK THEME (default) ---- */
+    :root {
+      color-scheme: dark;
+      --bg:            #070b14;   /* page background */
+      --bg-alt:        #0b1120;   /* alternating section background */
+      --surface:       #101828;   /* cards */
+      --surface-2:     #151f33;   /* chips, inner panels */
+      --border:        #1e2a40;   /* hairlines */
+      --text:          #e6edf6;   /* main text */
+      --muted:         #94a3b8;   /* secondary text */
+      --accent:        #00d4ff;   /* electric blue / teal */
+      --accent-soft:   rgba(0, 212, 255, 0.12);
+      --accent-glow:   rgba(0, 212, 255, 0.35);
+      --accent-border: rgba(0, 212, 255, 0.30);
+      --on-accent:     #04121a;   /* text on solid accent buttons */
+      --nav-bg:        rgba(7, 11, 20, 0.82);
+      --nav-bg-solid:  rgba(7, 11, 20, 0.97);
+      --grid-line:     rgba(0, 212, 255, 0.045);
+      --hero-glow-1:   rgba(0, 212, 255, 0.13);
+      --hero-glow-2:   rgba(0, 212, 255, 0.07);
+      --card-shadow:   none;
+
+      --font: "Space Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif;
+      --radius: 14px;
+      --nav-h: 68px;
+      --max-w: 1120px;
+    }
+
+    /* ---- LIGHT THEME: (a) follow system ---- */
+    @media (prefers-color-scheme: light) {
+      :root:not([data-theme="dark"]) {
+        color-scheme: light;
+        --bg:            #f7fafc;
+        --bg-alt:        #eef3f8;
+        --surface:       #ffffff;
+        --surface-2:     #f1f5f9;
+        --border:        #d8e1eb;
+        --text:          #0f172a;
+        --muted:         #475569;
+        --accent:        #0079a3;   /* deeper teal so text stays readable on white */
+        --accent-soft:   rgba(0, 121, 163, 0.10);
+        --accent-glow:   rgba(0, 180, 230, 0.28);
+        --accent-border: rgba(0, 121, 163, 0.30);
+        --on-accent:     #ffffff;
+        --nav-bg:        rgba(247, 250, 252, 0.85);
+        --nav-bg-solid:  rgba(247, 250, 252, 0.98);
+        --grid-line:     rgba(0, 121, 163, 0.07);
+        --hero-glow-1:   rgba(0, 212, 255, 0.18);
+        --hero-glow-2:   rgba(0, 212, 255, 0.10);
+        --card-shadow:   0 1px 3px rgba(15, 23, 42, 0.06), 0 4px 16px rgba(15, 23, 42, 0.04);
+      }
+    }
+
+    /* ---- LIGHT THEME: (b) chosen with the toggle ---- */
+    :root[data-theme="light"] {
+      color-scheme: light;
+      --bg:            #f7fafc;
+      --bg-alt:        #eef3f8;
+      --surface:       #ffffff;
+      --surface-2:     #f1f5f9;
+      --border:        #d8e1eb;
+      --text:          #0f172a;
+      --muted:         #475569;
+      --accent:        #0079a3;
+      --accent-soft:   rgba(0, 121, 163, 0.10);
+      --accent-glow:   rgba(0, 180, 230, 0.28);
+      --accent-border: rgba(0, 121, 163, 0.30);
+      --on-accent:     #ffffff;
+      --nav-bg:        rgba(247, 250, 252, 0.85);
+      --nav-bg-solid:  rgba(247, 250, 252, 0.98);
+      --grid-line:     rgba(0, 121, 163, 0.07);
+      --hero-glow-1:   rgba(0, 212, 255, 0.18);
+      --hero-glow-2:   rgba(0, 212, 255, 0.10);
+      --card-shadow:   0 1px 3px rgba(15, 23, 42, 0.06), 0 4px 16px rgba(15, 23, 42, 0.04);
+    }
+
+    /* ======================================================================
+       2. BASE / RESET
+       ====================================================================== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; scroll-padding-top: var(--nav-h); }
+
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      font-size: 16px;
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+      -webkit-text-size-adjust: 100%;   /* stop iOS from auto-resizing text */
+      text-size-adjust: 100%;
+      overflow-x: hidden;
+      transition: background-color .3s ease, color .3s ease;   /* smooth theme switch */
+    }
+
+    a { color: var(--accent); text-decoration: none; }
+    img { max-width: 100%; display: block; }
+    ::selection { background: var(--accent); color: var(--bg); }
+
+    .container { width: 100%; max-width: var(--max-w); margin: 0 auto; padding: 0 24px; }
+
+    section { padding: 110px 0; position: relative; }
+    section:nth-of-type(even) { background: var(--bg-alt); }
+
+    /* Section heading: small mono-ish label + large title */
+    .section-label {
+      display: inline-flex; align-items: center; gap: 10px;
+      color: var(--accent); font-size: 0.85rem; font-weight: 600;
+      letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 10px;
+    }
+    .section-label::before { content: ""; width: 28px; height: 2px; background: var(--accent); }
+    .section-title { font-size: clamp(1.9rem, 4vw, 2.6rem); font-weight: 700; line-height: 1.2; margin-bottom: 48px; }
+
+    /* Shared card style + glowing hover effect */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+      box-shadow: var(--card-shadow);   /* soft shadow in light theme, none in dark */
+      transition: transform .3s ease, border-color .3s ease, box-shadow .3s ease, background-color .3s ease;
+    }
+    .card:hover {
+      transform: translateY(-4px);
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px var(--accent-soft), 0 10px 40px -10px var(--accent-glow);
+    }
+
+    /* Chips / badges (skills + tech tags) */
+    .chip {
+      display: inline-block;
+      padding: 6px 13px;
+      font-size: 0.82rem; font-weight: 500;
+      color: var(--text);
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      transition: all .25s ease;
+    }
+    .chip:hover { color: var(--accent); border-color: var(--accent); box-shadow: 0 0 14px var(--accent-soft); }
+    .chip.sm { padding: 4px 10px; font-size: 0.75rem; color: var(--accent); background: var(--accent-soft); border-color: transparent; }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex; align-items: center; gap: 10px;
+      padding: 13px 26px; border-radius: 10px;
+      font-family: inherit; font-size: 0.95rem; font-weight: 600;
+      cursor: pointer; transition: all .25s ease;
+    }
+    .btn-primary { background: var(--accent); color: var(--on-accent); border: 1px solid var(--accent); }
+    .btn-primary:hover { box-shadow: 0 0 28px var(--accent-glow); transform: translateY(-2px); }
+    .btn-ghost { background: transparent; color: var(--text); border: 1px solid var(--border); }
+    .btn-ghost:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-2px); }
+
+    /* ======================================================================
+       3. FADE-IN ON SCROLL — elements with .reveal animate in (see JS)
+       ====================================================================== */
+    .reveal { opacity: 0; transform: translateY(28px); transition: opacity .8s ease, transform .8s ease; }
+    .reveal.visible { opacity: 1; transform: none; }
+
+    /* ======================================================================
+       4. NAVBAR (sticky)
+       ====================================================================== */
+    .navbar {
+      position: fixed; inset: 0 0 auto 0; height: var(--nav-h); z-index: 100;
+      display: flex; align-items: center;
+      transition: background .3s ease, border-color .3s ease;
+      border-bottom: 1px solid transparent;
+    }
+    .navbar.scrolled {
+      background: var(--nav-bg);
+      backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+      border-bottom-color: var(--border);
+    }
+    .navbar .container { display: flex; align-items: center; justify-content: space-between; }
+    .logo { font-size: 1.35rem; font-weight: 700; color: var(--text); letter-spacing: -0.02em; }
+    .logo span { color: var(--accent); }
+
+    .nav-links { display: flex; gap: 30px; list-style: none; margin-left: auto; }
+    .nav-links a {
+      color: var(--muted); font-size: 0.93rem; font-weight: 500; position: relative; transition: color .2s;
+    }
+    .nav-links a::after {
+      content: ""; position: absolute; left: 0; bottom: -6px; width: 0; height: 2px;
+      background: var(--accent); transition: width .25s ease;
+    }
+    .nav-links a:hover, .nav-links a.active { color: var(--text); }
+    .nav-links a:hover::after, .nav-links a.active::after { width: 100%; }
+
+    /* Right side of navbar: theme toggle + hamburger */
+    .nav-actions { display: flex; align-items: center; gap: 8px; margin-left: 24px; }
+
+    /* Light/dark theme toggle button (sun shows in dark mode, moon in light) */
+    .theme-toggle {
+      width: 40px; height: 40px; display: grid; place-items: center;
+      background: var(--surface); color: var(--text);
+      border: 1px solid var(--border); border-radius: 10px;
+      font-size: 1rem; cursor: pointer; transition: all .25s ease;
+    }
+    .theme-toggle:hover { color: var(--accent); border-color: var(--accent); box-shadow: 0 0 14px var(--accent-soft); }
+
+    /* Hamburger (mobile only) */
+    .nav-toggle { display: none; width: 40px; height: 40px; background: none; border: 0; color: var(--text); font-size: 1.4rem; cursor: pointer; }
+
+    /* ======================================================================
+       5. HERO
+       ====================================================================== */
+    .hero {
+      min-height: 100vh; display: flex; align-items: center;
+      padding-top: var(--nav-h);
+      background:
+        radial-gradient(circle at 78% 30%, var(--hero-glow-1), transparent 42%),
+        radial-gradient(circle at 10% 85%, var(--hero-glow-2), transparent 40%),
+        var(--bg) !important;
+      overflow: hidden;
+    }
+    /* Faint grid pattern behind the hero */
+    .hero::before {
+      content: ""; position: absolute; inset: 0;
+      background-image:
+        linear-gradient(var(--grid-line) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+      background-size: 56px 56px;
+      mask-image: radial-gradient(ellipse at center, #000 30%, transparent 75%);
+      -webkit-mask-image: radial-gradient(ellipse at center, #000 30%, transparent 75%);
+      pointer-events: none;
+    }
+    .hero-grid { display: grid; grid-template-columns: 1.35fr 1fr; gap: 60px; align-items: center; position: relative; }
+
+    .hero-status {
+      display: inline-flex; align-items: center; gap: 10px;
+      padding: 7px 14px; border: 1px solid var(--border); border-radius: 999px;
+      background: var(--surface); color: var(--muted); font-size: 0.85rem; margin-bottom: 26px;
+    }
+    .pulse { width: 8px; height: 8px; border-radius: 50%; background: #22e39b; box-shadow: 0 0 0 0 rgba(34, 227, 155, .6); animation: pulse 2s infinite; }
+    @keyframes pulse { 70% { box-shadow: 0 0 0 10px rgba(34, 227, 155, 0); } 100% { box-shadow: 0 0 0 0 rgba(34, 227, 155, 0); } }
+
+    .hero-greeting { color: var(--accent); font-weight: 500; font-size: 1.05rem; margin-bottom: 8px; }
+    .hero-name { font-size: clamp(2.6rem, 6.5vw, 4.4rem); font-weight: 700; line-height: 1.05; letter-spacing: -0.03em; }
+    .hero-title { font-size: clamp(1.2rem, 2.6vw, 1.6rem); font-weight: 500; color: var(--muted); margin: 14px 0 6px; }
+
+    /* Typing animation line */
+    .hero-typing { font-size: clamp(1.1rem, 2.4vw, 1.45rem); font-weight: 600; min-height: 2.2em; }
+    .hero-typing .typed { color: var(--accent); }
+    .cursor { display: inline-block; width: 3px; height: 1.1em; background: var(--accent); margin-left: 3px; vertical-align: -0.15em; animation: blink 1s steps(1) infinite; }
+    @keyframes blink { 50% { opacity: 0; } }
+
+    .hero-tagline { color: var(--muted); font-size: 1.08rem; max-width: 560px; margin: 14px 0 34px; }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 34px; }
+
+    .hero-socials { display: flex; gap: 14px; }
+    .hero-socials a {
+      width: 44px; height: 44px; display: grid; place-items: center;
+      border: 1px solid var(--border); border-radius: 10px; color: var(--muted); font-size: 1.1rem;
+      transition: all .25s ease;
+    }
+    .hero-socials a:hover { color: var(--accent); border-color: var(--accent); box-shadow: 0 0 18px var(--accent-soft); transform: translateY(-3px); }
+
+    /* Photo with rotating glow ring */
+    .hero-photo { position: relative; width: min(340px, 80vw); aspect-ratio: 1; justify-self: center; }
+    .hero-photo::before {
+      content: ""; position: absolute; inset: -6px; border-radius: 50%;
+      background: conic-gradient(from 0deg, var(--accent), transparent 35%, var(--accent) 65%, transparent);
+      animation: spin 8s linear infinite; filter: blur(2px);
+    }
+    .hero-photo img {
+      position: relative; width: 100%; height: 100%; object-fit: cover; object-position: center top;
+      border-radius: 50%; border: 6px solid var(--bg);
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .scroll-hint { position: absolute; left: 50%; bottom: 28px; transform: translateX(-50%); color: var(--muted); font-size: 1.2rem; animation: bob 2s ease-in-out infinite; }
+    @keyframes bob { 50% { transform: translate(-50%, 8px); } }
+
+    /* ======================================================================
+       6. ABOUT
+       ====================================================================== */
+    .about-grid { display: grid; grid-template-columns: 1.5fr 1fr; gap: 50px; align-items: start; }
+    .about-text p { color: var(--muted); font-size: 1.08rem; margin-bottom: 18px; }
+    .about-text p strong { color: var(--text); font-weight: 600; }
+    .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .stat { text-align: left; padding: 22px; }
+    .stat-num { font-size: 2rem; font-weight: 700; color: var(--accent); line-height: 1.1; }
+    .stat-label { color: var(--muted); font-size: 0.88rem; margin-top: 6px; }
+
+    /* ======================================================================
+       7. EXPERIENCE — vertical timeline
+       ====================================================================== */
+    .timeline { position: relative; padding-left: 36px; }
+    .timeline::before {
+      content: ""; position: absolute; left: 8px; top: 6px; bottom: 6px; width: 2px;
+      background: linear-gradient(var(--accent), var(--border) 70%);
+    }
+    .tl-item { position: relative; margin-bottom: 30px; }
+    .tl-item:last-child { margin-bottom: 0; }
+    .tl-dot {
+      position: absolute; left: -36px; top: 30px; width: 18px; height: 18px; border-radius: 50%;
+      background: var(--bg); border: 3px solid var(--accent); box-shadow: 0 0 14px var(--accent-glow);
+    }
+    .tl-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; margin-bottom: 4px; }
+    .tl-role { font-size: 1.2rem; font-weight: 600; }
+    .tl-date { font-size: 0.85rem; color: var(--accent); background: var(--accent-soft); padding: 4px 12px; border-radius: 999px; white-space: nowrap; }
+    .tl-org { color: var(--muted); font-size: 0.95rem; margin-bottom: 14px; }
+    .tl-org i { margin-right: 6px; }
+    .tl-list { list-style: none; display: grid; gap: 10px; margin-bottom: 16px; }
+    .tl-list li { position: relative; padding-left: 20px; color: var(--muted); font-size: 0.96rem; }
+    .tl-list li::before { content: "▹"; position: absolute; left: 0; color: var(--accent); }
+    .tl-list li b { color: var(--text); font-weight: 600; }
+    .tags { display: flex; flex-wrap: wrap; gap: 8px; }
+
+    /* ======================================================================
+       8. SKILLS — chip groups
+       ====================================================================== */
+    .skills-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; }
+    .skill-head { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; }
+    .skill-icon {
+      width: 44px; height: 44px; border-radius: 10px; display: grid; place-items: center;
+      background: var(--accent-soft); color: var(--accent); font-size: 1.15rem;
+    }
+    .skill-head h3 { font-size: 1.15rem; font-weight: 600; }
+    .chips { display: flex; flex-wrap: wrap; gap: 9px; }
+
+    /* ======================================================================
+       9. PROJECTS
+       ====================================================================== */
+    .projects-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+    .project { display: flex; flex-direction: column; }
+    .project-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
+    .project-icon { font-size: 1.8rem; color: var(--accent); }
+    .project-kind { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.12em; }
+    .project h3 { font-size: 1.12rem; font-weight: 600; line-height: 1.35; margin-bottom: 10px; }
+    .project p { color: var(--muted); font-size: 0.93rem; margin-bottom: 16px; flex: 1; }
+    .metric { display: inline-flex; align-items: center; gap: 8px; color: var(--text); font-weight: 600; font-size: 0.9rem; margin-bottom: 16px; }
+    .metric i { color: var(--accent); }
+    .center-cta { text-align: center; margin-top: 44px; }
+
+    /* ======================================================================
+       10. PUBLICATIONS
+       ====================================================================== */
+    .pub-list { display: grid; gap: 22px; }
+    .pub { display: grid; grid-template-columns: auto 1fr auto; gap: 24px; align-items: start; }
+    .pub-year {
+      font-size: 0.9rem; font-weight: 700; color: var(--accent);
+      border: 1px solid var(--accent); border-radius: 8px; padding: 6px 12px;
+    }
+    .pub-title { font-size: 1.12rem; font-weight: 600; line-height: 1.4; margin-bottom: 8px; color: var(--text); }
+    .pub-title:hover { color: var(--accent); }
+    .pub-authors { color: var(--muted); font-size: 0.92rem; margin-bottom: 6px; }
+    .pub-authors .me { color: var(--text); font-weight: 600; text-decoration: underline; text-decoration-color: var(--accent); text-underline-offset: 3px; }
+    .pub-venue { color: var(--muted); font-size: 0.9rem; font-style: italic; margin-bottom: 12px; }
+    .pub-desc { color: var(--muted); font-size: 0.92rem; margin-bottom: 14px; }
+    .pub-links { display: flex; gap: 18px; flex-wrap: wrap; font-size: 0.88rem; font-weight: 500; }
+    .pub-links a:hover { text-decoration: underline; }
+    /* Citation badge */
+    .cite-badge {
+      display: flex; flex-direction: column; align-items: center; min-width: 86px;
+      padding: 12px 14px; border-radius: 12px;
+      background: var(--accent-soft); border: 1px solid var(--accent-border);
+    }
+    .cite-badge .num { font-size: 1.6rem; font-weight: 700; color: var(--accent); line-height: 1; }
+    .cite-badge .lbl { font-size: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: .1em; margin-top: 6px; }
+    .scholar-bar { display: flex; justify-content: space-between; align-items: center; gap: 20px; flex-wrap: wrap; margin-bottom: 26px; color: var(--muted); }
+    .scholar-bar strong { color: var(--text); }
+
+    /* ======================================================================
+       11. EDUCATION
+       ====================================================================== */
+    .edu-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; margin-bottom: 40px; }
+    .edu-icon { font-size: 1.6rem; color: var(--accent); margin-bottom: 16px; }
+    .edu h3 { font-size: 1.2rem; font-weight: 600; margin-bottom: 4px; }
+    .edu .degree { color: var(--text); margin-bottom: 4px; }
+    .edu .meta { color: var(--muted); font-size: 0.92rem; }
+    .edu .highlight { display: inline-block; margin-top: 14px; }
+    .cert-title { font-size: 1.05rem; font-weight: 600; margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
+    .cert-title i { color: var(--accent); }
+
+    /* ======================================================================
+       12. CONTACT
+       ====================================================================== */
+    .contact-intro { color: var(--muted); font-size: 1.1rem; max-width: 620px; margin: -24px 0 40px; }
+    .contact-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+    .contact-card { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; color: var(--text); }
+    .contact-card i { font-size: 1.5rem; color: var(--accent); }
+    .contact-card .lbl { font-size: 0.8rem; color: var(--muted); text-transform: uppercase; letter-spacing: .12em; }
+    .contact-card .val { font-size: 0.95rem; font-weight: 500; word-break: break-word; }
+
+    footer { padding: 30px 0; border-top: 1px solid var(--border); color: var(--muted); font-size: 0.88rem; text-align: center; }
+
+    /* Back-to-top button */
+    .to-top {
+      position: fixed; right: 22px; bottom: 22px; z-index: 90;
+      width: 46px; height: 46px; border-radius: 12px; border: 1px solid var(--accent);
+      background: var(--surface); color: var(--accent); font-size: 1rem; cursor: pointer;
+      opacity: 0; pointer-events: none; transform: translateY(10px); transition: all .3s ease;
+    }
+    .to-top.show { opacity: 1; pointer-events: auto; transform: none; }
+    .to-top:hover { box-shadow: 0 0 20px var(--accent-glow); }
+
+    /* ======================================================================
+       13. RESPONSIVE
+       ====================================================================== */
+    @media (max-width: 960px) {
+      .projects-grid { grid-template-columns: repeat(2, 1fr); }
+      .contact-grid { grid-template-columns: repeat(2, 1fr); }
+      .about-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 820px) {
+      /* Mobile nav: slide-down menu */
+      .nav-toggle { display: block; }
+      .nav-links {
+        position: absolute; top: var(--nav-h); left: 0; right: 0;
+        flex-direction: column; gap: 0; padding: 10px 24px 20px;
+        background: var(--nav-bg-solid); border-bottom: 1px solid var(--border);
+        transform: translateY(-12px); opacity: 0; pointer-events: none; transition: all .25s ease;
+      }
+      .nav-links.open { transform: none; opacity: 1; pointer-events: auto; }
+      .nav-links li a { display: block; padding: 12px 0; }
+      .navbar.menu-open { background: var(--nav-bg-solid); }
+
+      .hero-grid { grid-template-columns: 1fr; text-align: left; gap: 40px; }
+      .hero-photo { order: -1; width: min(220px, 60vw); justify-self: start; }
+      .skills-grid, .edu-grid { grid-template-columns: 1fr; }
+      .scroll-hint { display: none; }
+    }
+    @media (max-width: 600px) {
+      section { padding: 80px 0; }
+      .container { padding: 0 16px; }
+      .projects-grid, .contact-grid { grid-template-columns: 1fr; }
+      .card { padding: 22px; }
+      .pub { grid-template-columns: 1fr; gap: 14px; }
+      .pub-year { justify-self: start; }
+      .cite-badge { flex-direction: row; gap: 10px; justify-self: start; }
+      .cite-badge .lbl { margin-top: 0; }
+      .timeline { padding-left: 28px; }
+      .tl-dot { left: -28px; }
+      .timeline::before { left: 7px; }
+
+      /* ---- Mobile typography: keep body text >= ~15px and readable ---- */
+      body { line-height: 1.7; }
+      .hero-name { font-size: clamp(2.3rem, 11vw, 2.8rem); }
+      .hero-title { font-size: 1.2rem; }
+      .hero-typing { font-size: 1.1rem; min-height: 3.2em; }   /* room for 2 lines */
+      .hero-tagline, .about-text p, .contact-intro { font-size: 1.02rem; }
+      .hero-status { font-size: 0.85rem; line-height: 1.4; }
+      .section-title { font-size: 1.8rem; margin-bottom: 36px; }
+      .tl-role { font-size: 1.1rem; }
+      .tl-list li, .project p, .pub-desc, .pub-authors, .tl-org, .edu .meta { font-size: 0.97rem; }
+      .pub-title { font-size: 1.05rem; }
+      .pub-venue, .metric, .stat-label { font-size: 0.93rem; }
+      .chip { font-size: 0.88rem; padding: 7px 13px; }
+      .chip.sm { font-size: 0.8rem; }
+      .project-kind, .contact-card .lbl, .cite-badge .lbl { font-size: 0.78rem; }
+      .contact-card .val { font-size: 1rem; }
+      .stat-num { font-size: 1.7rem; }
+      .btn { padding: 13px 22px; }
+    }
+
+    /* Respect users who prefer less motion */
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { animation: none !important; transition: none !important; }
+      .reveal { opacity: 1; transform: none; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ========================================================================
+       SECTION: NAVBAR
+       ======================================================================== -->
+  <nav class="navbar" id="navbar">
+    <div class="container">
+      <a href="#home" class="logo">Kiran<span>.</span></a>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="#about">About</a></li>
+        <li><a href="#experience">Experience</a></li>
+        <li><a href="#skills">Skills</a></li>
+        <li><a href="#projects">Projects</a></li>
+        <li><a href="#publications">Publications</a></li>
+        <li><a href="#education">Education</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+      <div class="nav-actions">
+        <!-- Theme toggle: icon + label are set by JS (section 4) -->
+        <button class="theme-toggle" id="themeToggle" aria-label="Switch theme">
+          <i class="fa-solid fa-sun"></i>
+        </button>
+        <button class="nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <main>
+
+    <!-- ======================================================================
+         SECTION: HERO
+         Typing phrases are set in the <script> (TYPING_PHRASES).
+         ====================================================================== -->
+    <section class="hero" id="home">
+      <div class="container hero-grid">
+        <div>
+          <div class="hero-status"><span class="pulse"></span> Open to ML Engineer, AI Engineer &amp; Data Scientist roles</div>
+          <p class="hero-greeting">Hi, I'm</p>
+          <h1 class="hero-name">Kiran Babu Athina</h1>
+          <h2 class="hero-title">Machine Learning &amp; AI Engineer</h2>
+          <p class="hero-typing">I build <span class="typed" id="typed"></span><span class="cursor"></span></p>
+          <p class="hero-tagline">
+            From agentic RAG on GPU clusters to PySpark pipelines moving 100M+ records a day,
+            I ship AI that holds up in production, and every system comes with an eval set and a baseline.
+          </p>
+          <div class="hero-actions">
+            <a href="#projects" class="btn btn-primary"><i class="fa-solid fa-rocket"></i> View my work</a>
+            <a href="#contact" class="btn btn-ghost"><i class="fa-regular fa-paper-plane"></i> Get in touch</a>
+          </div>
+          <div class="hero-socials">
+            <a href="https://github.com/FriendyKiran" target="_blank" rel="noopener" aria-label="GitHub"><i class="fa-brands fa-github"></i></a>
+            <a href="https://www.linkedin.com/in/athinakiranbabu" target="_blank" rel="noopener" aria-label="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
+            <a href="https://scholar.google.com/citations?user=wWen3jgAAAAJ&hl=en" target="_blank" rel="noopener" aria-label="Google Scholar"><i class="fa-solid fa-graduation-cap"></i></a>
+            <a href="mailto:kiranathina8@gmail.com" aria-label="Email"><i class="fa-solid fa-envelope"></i></a>
+          </div>
+        </div>
+
+        <!-- Profile photo: keep "formal image.jpg" in the same folder -->
+        <div class="hero-photo">
+          <img src="formal%20image.jpg" alt="Portrait of Kiran Babu Athina" />
+        </div>
+      </div>
+      <a href="#about" class="scroll-hint" aria-label="Scroll down"><i class="fa-solid fa-chevron-down"></i></a>
+    </section>
+
+    <!-- ======================================================================
+         SECTION: ABOUT
+         ====================================================================== -->
+    <section id="about">
+      <div class="container">
+        <p class="section-label reveal">About</p>
+        <h2 class="section-title reveal">Rigorous evaluation, production-grade AI</h2>
+
+        <div class="about-grid">
+          <div class="about-text reveal">
+            <p>
+              I'm a <strong>Machine Learning and AI Engineer</strong> with four years of experience building and shipping
+              production ML across telecom, finance, healthcare, and agricultural research.
+            </p>
+            <p>
+              At Texas A&amp;M's <strong>AISLS Lab</strong> I build agentic RAG systems over knowledge graphs and fine-tune
+              open LLMs like Gemma and LLaMA on local GPU infrastructure. Before that, at <strong>Tata Consultancy Services</strong>,
+              I engineered PySpark pipelines, NLP classifiers, and multimodal QC models running on Docker and Kubernetes.
+            </p>
+            <p>
+              I hold an <strong>M.S. in Data Science from Texas A&amp;M (3.9 GPA)</strong>. I don't call a model done until it
+              has a held-out eval set, a baseline to beat, and a clear recommendation stakeholders can act on.
+            </p>
+          </div>
+
+          <!-- Headline numbers (all from resume) -->
+          <div class="stats">
+            <div class="card stat reveal"><div class="stat-num">4+</div><div class="stat-label">Years building production ML</div></div>
+            <div class="card stat reveal"><div class="stat-num">98.7%</div><div class="stat-label">Recall@5, agentic KG-RAG</div></div>
+            <div class="card stat reveal"><div class="stat-num">100M+</div><div class="stat-label">Records/day through PySpark ETL</div></div>
+            <div class="card stat reveal"><div class="stat-num">3.9</div><div class="stat-label">GPA, M.S. Data Science</div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         SECTION: EXPERIENCE (vertical timeline)
+         Copy one ".tl-item" block to add a new role.
+         ====================================================================== -->
+    <section id="experience">
+      <div class="container">
+        <p class="section-label reveal">Experience</p>
+        <h2 class="section-title reveal">Where I've worked</h2>
+
+        <div class="timeline">
+
+          <!-- Role: AISLS Lab -->
+          <div class="tl-item reveal">
+            <span class="tl-dot"></span>
+            <div class="card">
+              <div class="tl-head">
+                <h3 class="tl-role">Research Assistant</h3>
+                <span class="tl-date">Jun 2025 – Present</span>
+              </div>
+              <p class="tl-org"><i class="fa-solid fa-flask"></i>Texas A&amp;M AISLS Lab · College Station, TX</p>
+              <ul class="tl-list">
+                <li>Achieved <b>98.7% Recall@5</b> across 3 domain-specific knowledge graphs with an agentic RAG system on TAMU HPC (2× NVIDIA RTX 6000), using a query-routing layer over 3 fine-tuned KG retrievers.</li>
+                <li>Cut general-purpose cloud API calls to <b>zero</b> for precision nutrition queries by fine-tuning <b>Gemma 4 12B</b> with LoRA on food-systems corpora aligned with SDG 2.</li>
+                <li>Reached <b>95% Hit@5</b> and <b>0.925 MRR</b> on a 1,000-question expert-curated eval set with a FastAPI RAG backend on Azure App Service (hybrid BM25 + FAISS over 120,000+ chunks).</li>
+                <li>Built a chunk-level scoring and citation pipeline inside the inference server: <b>86% source precision</b>, <b>95% source recall</b>.</li>
+                <li>Eliminated cold-start 503s, with <b>zero failed session initializations</b>, through a React chat frontend with race-safe bootstrapping, streaming UX, and path-triggered CI/CD on Azure.</li>
+              </ul>
+              <div class="tags">
+                <span class="chip sm">Agentic RAG</span><span class="chip sm">Knowledge Graphs</span><span class="chip sm">LoRA</span>
+                <span class="chip sm">FastAPI</span><span class="chip sm">FAISS</span><span class="chip sm">React</span><span class="chip sm">Azure</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Role: Aggie Research Program (leadership) -->
+          <div class="tl-item reveal">
+            <span class="tl-dot"></span>
+            <div class="card">
+              <div class="tl-head">
+                <h3 class="tl-role">Project Lead</h3>
+                <span class="tl-date">Aug 2025 – May 2026</span>
+              </div>
+              <p class="tl-org"><i class="fa-solid fa-users"></i>Aggie Research Program · Texas A&amp;M University</p>
+              <ul class="tl-list">
+                <li>Led teams of <b>3 undergraduate researchers</b> per project, owning end-to-end execution aligned with faculty research goals.</li>
+                <li>Scoped projects, broke research objectives into weekly tasks, and mentored students in applied ML, data analysis, and research practice.</li>
+                <li>Served as primary point of accountability, reporting progress, risks, and results to the supervising professor weekly.</li>
+              </ul>
+              <div class="tags">
+                <span class="chip sm">Leadership</span><span class="chip sm">Mentoring</span><span class="chip sm">Research Management</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Role: Animal Science -->
+          <div class="tl-item reveal">
+            <span class="tl-dot"></span>
+            <div class="card">
+              <div class="tl-head">
+                <h3 class="tl-role">Graduate Research Assistant</h3>
+                <span class="tl-date">Jan 2024 – May 2025</span>
+              </div>
+              <p class="tl-org"><i class="fa-solid fa-cow"></i>Texas A&amp;M Department of Animal Science · College Station, TX</p>
+              <ul class="tl-list">
+                <li>Eliminated Azure OpenAI calls for livestock terminology queries by fine-tuning <b>LLaMA 3 with LoRA/PEFT</b> on a proprietary animal science corpus.</li>
+                <li>Delivered grounded, citation-backed answers with a RAG pipeline on <b>Azure AI Search + Azure OpenAI</b>, validated by faculty review across 3 semesters.</li>
+                <li>Built a sensor-driven <b>digital twin</b> (MQTT + Mesa agent-based model) for minute-level per-animal energy tracking and monthly methane forecasting.</li>
+              </ul>
+              <div class="tags">
+                <span class="chip sm">LLaMA 3</span><span class="chip sm">PEFT</span><span class="chip sm">Azure OpenAI</span>
+                <span class="chip sm">Mesa ABM</span><span class="chip sm">MQTT</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Role: TCS ML Engineer -->
+          <div class="tl-item reveal">
+            <span class="tl-dot"></span>
+            <div class="card">
+              <div class="tl-head">
+                <h3 class="tl-role">Machine Learning Engineer</h3>
+                <span class="tl-date">Aug 2021 – Jul 2023</span>
+              </div>
+              <p class="tl-org"><i class="fa-solid fa-building"></i>Tata Consultancy Services · Hyderabad, India</p>
+              <ul class="tl-list">
+                <li>Cut loan processing time by <b>30%</b> with classification models on Azure ML using AutoML selection and statistical feature engineering.</li>
+                <li>Eliminated <b>30%</b> of manual hardware log triage and sped up issue resolution by <b>18%</b> with a TF-IDF + Random Forest NLP pipeline over 500,000+ daily telecom logs.</li>
+                <li>Reached <b>92% pass/fail accuracy</b> on hardware label QC across 10,000+ devices/month with a multimodal ResNet-18 + BERT verification system.</li>
+                <li>Processed <b>100M+ sensor records/day</b> for fault-prediction models with a PySpark ETL framework on Hadoop.</li>
+                <li>Reduced post-deployment performance decay by <b>22%</b> with drift dashboards and retraining triggers, and cut deployment turnaround by <b>30%</b> with Docker + Kubernetes auto-scaling.</li>
+              </ul>
+              <div class="tags">
+                <span class="chip sm">PySpark</span><span class="chip sm">Hadoop</span><span class="chip sm">Azure ML</span>
+                <span class="chip sm">BERT</span><span class="chip sm">ResNet</span><span class="chip sm">Docker</span><span class="chip sm">Kubernetes</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Role: TCS Intern -->
+          <div class="tl-item reveal">
+            <span class="tl-dot"></span>
+            <div class="card">
+              <div class="tl-head">
+                <h3 class="tl-role">Machine Learning Engineer Intern</h3>
+                <span class="tl-date">May 2021 – Jul 2021</span>
+              </div>
+              <p class="tl-org"><i class="fa-solid fa-building"></i>Tata Consultancy Services · Hyderabad, India</p>
+              <ul class="tl-list">
+                <li>Achieved <b>98.5% fraud classification accuracy</b> on KYC anomaly detection with a multimodal PyTorch model fusing 1D CNN audio and 2D CNN document-image embeddings.</li>
+                <li>Reduced onboarding and handoff time by <b>25%</b> by writing end-to-end documentation of model architectures, assumptions, and evaluation results.</li>
+              </ul>
+              <div class="tags">
+                <span class="chip sm">PyTorch</span><span class="chip sm">CNNs</span><span class="chip sm">Multimodal</span><span class="chip sm">Fraud Detection</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         SECTION: SKILLS (chips grouped by category)
+         Add/remove a <span class="chip">...</span> to edit.
+         ====================================================================== -->
+    <section id="skills">
+      <div class="container">
+        <p class="section-label reveal">Skills</p>
+        <h2 class="section-title reveal">My toolkit</h2>
+
+        <div class="skills-grid">
+          <!-- Languages -->
+          <div class="card reveal">
+            <div class="skill-head"><div class="skill-icon"><i class="fa-solid fa-code"></i></div><h3>Languages</h3></div>
+            <div class="chips">
+              <span class="chip">Python</span><span class="chip">SQL</span><span class="chip">JavaScript</span>
+              <span class="chip">R</span><span class="chip">C</span>
+            </div>
+          </div>
+
+          <!-- ML / AI -->
+          <div class="card reveal">
+            <div class="skill-head"><div class="skill-icon"><i class="fa-solid fa-brain"></i></div><h3>ML / AI</h3></div>
+            <div class="chips">
+              <span class="chip">LLMs</span><span class="chip">RAG</span><span class="chip">Agentic AI</span>
+              <span class="chip">Knowledge Graphs</span><span class="chip">LoRA</span><span class="chip">QLoRA</span>
+              <span class="chip">PEFT</span><span class="chip">Transformers</span><span class="chip">Vision-Language Models</span>
+              <span class="chip">CLIP</span><span class="chip">Prompt Engineering</span><span class="chip">PyTorch</span>
+              <span class="chip">TensorFlow</span><span class="chip">Hugging Face</span><span class="chip">Scikit-learn</span>
+              <span class="chip">LangChain</span><span class="chip">LangGraph</span><span class="chip">FAISS</span>
+              <span class="chip">NLTK</span><span class="chip">XGBoost</span><span class="chip">LightGBM</span>
+              <span class="chip">ARIMA / SARIMA / LSTM</span>
+            </div>
+          </div>
+
+          <!-- Cloud -->
+          <div class="card reveal">
+            <div class="skill-head"><div class="skill-icon"><i class="fa-solid fa-cloud"></i></div><h3>Cloud &amp; HPC</h3></div>
+            <div class="chips">
+              <span class="chip">Azure AI Search</span><span class="chip">Azure AI Foundry</span><span class="chip">Azure OpenAI</span>
+              <span class="chip">Azure ML</span><span class="chip">Azure App Service</span><span class="chip">Azure Static Web Apps</span>
+              <span class="chip">Azure Blob Storage</span><span class="chip">AWS S3</span><span class="chip">AWS EC2</span>
+              <span class="chip">AWS SageMaker</span><span class="chip">NVIDIA GPU Clusters</span>
+            </div>
+          </div>
+
+          <!-- Tools -->
+          <div class="card reveal">
+            <div class="skill-head"><div class="skill-icon"><i class="fa-solid fa-screwdriver-wrench"></i></div><h3>Tools &amp; Data</h3></div>
+            <div class="chips">
+              <span class="chip">Docker</span><span class="chip">Kubernetes</span><span class="chip">CI/CD</span>
+              <span class="chip">Git / GitHub</span><span class="chip">FastAPI</span><span class="chip">React</span>
+              <span class="chip">PySpark</span><span class="chip">Hadoop</span><span class="chip">Streamlit</span>
+              <span class="chip">Tableau</span><span class="chip">PostgreSQL</span><span class="chip">MySQL</span>
+              <span class="chip">MongoDB</span><span class="chip">Redis</span><span class="chip">MQTT</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         SECTION: PROJECTS
+         Copy one ".project" card to add a new project.
+         ====================================================================== -->
+    <section id="projects">
+      <div class="container">
+        <p class="section-label reveal">Projects</p>
+        <h2 class="section-title reveal">Things I've built</h2>
+
+        <div class="projects-grid">
+
+          <article class="card project reveal">
+            <div class="project-top"><i class="fa-solid fa-diagram-project project-icon"></i><span class="project-kind">Research</span></div>
+            <h3>Agentic RAG over Domain Knowledge Graphs</h3>
+            <p>Agentic retrieval system on TAMU HPC with a query-routing layer that sends each question to one of 3 fine-tuned knowledge-graph retrievers.</p>
+            <div class="metric"><i class="fa-solid fa-chart-line"></i>98.7% Recall@5 on held-out eval</div>
+            <div class="tags"><span class="chip sm">Agentic AI</span><span class="chip sm">Knowledge Graphs</span><span class="chip sm">Query Routing</span><span class="chip sm">TAMU HPC</span><span class="chip sm">RTX 6000</span></div>
+          </article>
+
+          <article class="card project reveal">
+            <div class="project-top"><i class="fa-solid fa-magnifying-glass-chart project-icon"></i><span class="project-kind">Research</span></div>
+            <h3>Source-Grounded RAG Platform on Azure</h3>
+            <p>FastAPI backend plus React chat frontend indexing 120,000+ document chunks with hybrid BM25 + FAISS retrieval and top-5 source traceability on every answer.</p>
+            <div class="metric"><i class="fa-solid fa-chart-line"></i>95% Hit@5 · 0.925 MRR</div>
+            <div class="tags"><span class="chip sm">FastAPI</span><span class="chip sm">BM25</span><span class="chip sm">FAISS</span><span class="chip sm">React</span><span class="chip sm">Azure</span></div>
+          </article>
+
+          <article class="card project reveal">
+            <div class="project-top"><i class="fa-solid fa-eye project-icon"></i><span class="project-kind">Healthcare AI</span></div>
+            <h3>Retinal Disease Diagnosis with Vision-Language Models</h3>
+            <p>Fine-tuned MedGemma 4B on paired fundus images and clinical notes for 12-class retinal disease classification, validated on 1,200+ expert-annotated images.</p>
+            <div class="metric"><i class="fa-solid fa-chart-line"></i>91% diagnostic accuracy</div>
+            <div class="tags"><span class="chip sm">MedGemma 4B</span><span class="chip sm">VLMs</span><span class="chip sm">Fine-tuning</span><span class="chip sm">Medical Imaging</span></div>
+          </article>
+
+          <article class="card project reveal">
+            <div class="project-top"><i class="fa-solid fa-images project-icon"></i><span class="project-kind">Deep Learning</span></div>
+            <h3>CLIP-style Multimodal Contrastive Learning</h3>
+            <p>Dual-encoder ResNet-50 + DistilBERT model trained with NT-Xent and iSogCLR losses and AdamW/RAdam optimizers, benchmarked against baseline CLIP.</p>
+            <div class="metric"><i class="fa-solid fa-chart-line"></i>+17% retrieval (MSCOCO) · +14% zero-shot (ImageNet)</div>
+            <div class="tags"><span class="chip sm">PyTorch</span><span class="chip sm">ResNet-50</span><span class="chip sm">DistilBERT</span><span class="chip sm">Contrastive Learning</span></div>
+          </article>
+
+          <article class="card project reveal">
+            <div class="project-top"><i class="fa-solid fa-user-astronaut project-icon"></i><span class="project-kind">NASA Space Apps 2025</span></div>
+            <h3>Exoplanet Discovery</h3>
+            <p>Ensemble of Random Forest, XGBoost, LightGBM, Gradient Boosting, and MLP classifying confirmed exoplanets, candidates, and false positives from Kepler and TESS data.</p>
+            <div class="metric"><i class="fa-solid fa-chart-line"></i>96.64% classification accuracy</div>
+            <div class="tags"><span class="chip sm">XGBoost</span><span class="chip sm">LightGBM</span><span class="chip sm">Scikit-learn</span><span class="chip sm">Streamlit</span></div>
+          </article>
+
+          <article class="card project reveal">
+            <div class="project-top"><i class="fa-solid fa-cow project-icon"></i><span class="project-kind">Research</span></div>
+            <h3>Livestock Digital Twin</h3>
+            <p>Sensor-driven agent-based simulation that ingests live MQTT sensor streams to model per-animal energy and methane dynamics.</p>
+            <div class="metric"><i class="fa-solid fa-chart-line"></i>Minute-level energy tracking · monthly CH₄ forecasts</div>
+            <div class="tags"><span class="chip sm">Python</span><span class="chip sm">Mesa ABM</span><span class="chip sm">MQTT</span><span class="chip sm">Simulation</span></div>
+          </article>
+
+        </div>
+
+        <div class="center-cta reveal">
+          <a href="https://github.com/FriendyKiran" target="_blank" rel="noopener" class="btn btn-ghost"><i class="fa-brands fa-github"></i> More on GitHub</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         SECTION: PUBLICATIONS (from Google Scholar)
+         Copy one ".pub" card to add a paper. Update the number inside
+         .cite-badge .num when your citation count changes.
+         ====================================================================== -->
+    <section id="publications">
+      <div class="container">
+        <p class="section-label reveal">Publications</p>
+        <h2 class="section-title reveal">Research output</h2>
+
+        <div class="scholar-bar reveal">
+          <span>Indexed on <strong>Google Scholar</strong> · Texas A&amp;M University · Artificial Intelligence</span>
+          <a href="https://scholar.google.com/citations?user=wWen3jgAAAAJ&hl=en" target="_blank" rel="noopener" class="btn btn-ghost">
+            <i class="fa-solid fa-graduation-cap"></i> Scholar profile
+          </a>
+        </div>
+
+        <div class="pub-list">
+
+          <article class="card pub reveal">
+            <span class="pub-year">2025</span>
+            <div>
+              <a class="pub-title" href="https://scholar.google.com/citations?view_op=view_citation&hl=en&user=wWen3jgAAAAJ&citation_for_view=wWen3jgAAAAJ:u5HHmVD_uO8C" target="_blank" rel="noopener">
+                An agent-based framework of cattle value discovery system for precision nutrient requirements and utilization prediction of beef cattle
+              </a>
+              <p class="pub-authors">K. Kaniyamattam, V. Kulangara-Veettil, P. Kundu, <span class="me">K. B. Athina</span>, L. O. Tedeschi</p>
+              <p class="pub-venue">CABI Digital Library · Vol. 16, Issue 3, p. 449 · September 2025</p>
+              <p class="pub-desc">
+                Translates the deterministic Cattle Value Discovery System (CVDS) into an agent-based model, simulating individual
+                cattle as autonomous agents with their own body weight, body condition score, and metabolic efficiency to predict
+                daily gain, days to finish, and carcass composition.
+              </p>
+              <div class="pub-links">
+                <a href="https://www.cabidigitallibrary.org/doi/full/10.5555/20250456444" target="_blank" rel="noopener"><i class="fa-solid fa-file-lines"></i> Full text</a>
+                <a href="https://scholar.google.com/citations?view_op=view_citation&hl=en&user=wWen3jgAAAAJ&citation_for_view=wWen3jgAAAAJ:u5HHmVD_uO8C" target="_blank" rel="noopener"><i class="fa-solid fa-graduation-cap"></i> Scholar entry</a>
+              </div>
+            </div>
+            <!-- Citation badge: update the number from Google Scholar -->
+            <div class="cite-badge" title="Citation count from Google Scholar">
+              <span class="num">0</span>
+              <span class="lbl">Citations</span>
+            </div>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         SECTION: EDUCATION (+ certifications)
+         ====================================================================== -->
+    <section id="education">
+      <div class="container">
+        <p class="section-label reveal">Education</p>
+        <h2 class="section-title reveal">Academic background</h2>
+
+        <div class="edu-grid">
+          <div class="card edu reveal">
+            <i class="fa-solid fa-graduation-cap edu-icon"></i>
+            <h3>Texas A&amp;M University</h3>
+            <p class="degree">M.S. in Data Science</p>
+            <p class="meta">Aug 2023 – May 2025 · College Station, TX</p>
+            <span class="chip sm highlight">GPA 3.9 / 4.0</span>
+          </div>
+          <div class="card edu reveal">
+            <i class="fa-solid fa-microchip edu-icon"></i>
+            <h3>Gayatri Vidya Parishad College of Engineering</h3>
+            <p class="degree">B.Tech. in Electronics &amp; Communication Engineering</p>
+            <p class="meta">Aug 2017 – Jul 2021</p>
+            <span class="chip sm highlight">First Class with Distinction</span>
+          </div>
+        </div>
+
+        <div class="card reveal">
+          <h3 class="cert-title"><i class="fa-solid fa-certificate"></i> Certifications</h3>
+          <div class="chips">
+            <span class="chip">NVIDIA DLI Certified</span>
+            <span class="chip">Generative AI Fundamentals</span>
+            <span class="chip">PCAP: Programming Essentials in Python</span>
+            <span class="chip">CCNA: Introduction to Networks</span>
+            <span class="chip">SailPoint Identity Security Leader</span>
+            <span class="chip">Intermediate SQL Queries</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         SECTION: CONTACT
+         ====================================================================== -->
+    <section id="contact">
+      <div class="container">
+        <p class="section-label reveal">Contact</p>
+        <h2 class="section-title reveal">Let's build something</h2>
+        <p class="contact-intro reveal">
+          I'm open to ML Engineer, AI Engineer, and Data Scientist roles. Based in Austin, TX. The fastest way to reach me is email.
+        </p>
+
+        <div class="contact-grid">
+          <a class="card contact-card reveal" href="mailto:kiranathina8@gmail.com">
+            <i class="fa-solid fa-envelope"></i><span class="lbl">Email</span><span class="val">kiranathina8@gmail.com</span>
+          </a>
+          <a class="card contact-card reveal" href="https://www.linkedin.com/in/athinakiranbabu" target="_blank" rel="noopener">
+            <i class="fa-brands fa-linkedin"></i><span class="lbl">LinkedIn</span><span class="val">in/athinakiranbabu</span>
+          </a>
+          <a class="card contact-card reveal" href="https://github.com/FriendyKiran" target="_blank" rel="noopener">
+            <i class="fa-brands fa-github"></i><span class="lbl">GitHub</span><span class="val">FriendyKiran</span>
+          </a>
+          <a class="card contact-card reveal" href="https://scholar.google.com/citations?user=wWen3jgAAAAJ&hl=en" target="_blank" rel="noopener">
+            <i class="fa-solid fa-graduation-cap"></i><span class="lbl">Google Scholar</span><span class="val">Kiran Babu Athina</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <div class="container">
+      © <span id="year"></span> Kiran Babu Athina · Built with HTML, CSS &amp; JavaScript
+    </div>
+  </footer>
+
+  <button class="to-top" id="toTop" aria-label="Back to top"><i class="fa-solid fa-arrow-up"></i></button>
+
+  <script>
+    /* ======================================================================
+       1. TYPING ANIMATION (hero)
+       Edit these phrases to change what gets "typed" after "I build".
+       ====================================================================== */
+    const TYPING_PHRASES = [
+      "agentic RAG systems.",
+      "fine-tuned LLMs with LoRA.",
+      "multimodal models.",
+      "PySpark pipelines at 100M+ records/day.",
+      "AI that ships with an eval set."
+    ];
+    const TYPE_SPEED = 65;    // ms per character typed
+    const DELETE_SPEED = 35;  // ms per character deleted
+    const HOLD_TIME = 1700;   // ms to pause on a full phrase
+
+    const typedEl = document.getElementById("typed");
+    let phraseIdx = 0, charIdx = 0, deleting = false;
+
+    function typeLoop() {
+      const phrase = TYPING_PHRASES[phraseIdx];
+      typedEl.textContent = phrase.slice(0, charIdx);
+
+      if (!deleting && charIdx < phrase.length) {
+        charIdx++;
+        setTimeout(typeLoop, TYPE_SPEED);
+      } else if (!deleting) {
+        deleting = true;
+        setTimeout(typeLoop, HOLD_TIME);
+      } else if (charIdx > 0) {
+        charIdx--;
+        setTimeout(typeLoop, DELETE_SPEED);
+      } else {
+        deleting = false;
+        phraseIdx = (phraseIdx + 1) % TYPING_PHRASES.length;
+        setTimeout(typeLoop, 300);
+      }
+    }
+
+    // Users who prefer reduced motion just see the first phrase
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      typedEl.textContent = TYPING_PHRASES[0];
+    } else {
+      typeLoop();
+    }
+
+    /* ======================================================================
+       2. FADE-IN ON SCROLL
+       Any element with class "reveal" fades up when it enters the viewport.
+       ====================================================================== */
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("visible");
+          revealObserver.unobserve(entry.target); // animate only once
+        }
+      });
+    }, { threshold: 0.12, rootMargin: "0px 0px -40px 0px" });
+
+    document.querySelectorAll(".reveal").forEach((el, i) => {
+      // Small stagger for items that appear together (e.g. grid cards)
+      el.style.transitionDelay = `${(i % 4) * 70}ms`;
+      revealObserver.observe(el);
+    });
+
+    /* ======================================================================
+       3. NAVBAR: background on scroll, active link, mobile menu
+       ====================================================================== */
+    const navbar = document.getElementById("navbar");
+    const navLinks = document.getElementById("navLinks");
+    const navToggle = document.getElementById("navToggle");
+    const toTop = document.getElementById("toTop");
+
+    function onScroll() {
+      const y = window.scrollY;
+      navbar.classList.toggle("scrolled", y > 20);
+      toTop.classList.toggle("show", y > 600);
+    }
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+
+    // Highlight the nav link for the section currently on screen
+    const linkFor = {};
+    navLinks.querySelectorAll("a").forEach((a) => (linkFor[a.getAttribute("href").slice(1)] = a));
+
+    const sectionObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          Object.values(linkFor).forEach((a) => a.classList.remove("active"));
+          const link = linkFor[entry.target.id];
+          if (link) link.classList.add("active");
+        }
+      });
+    }, { rootMargin: "-45% 0px -50% 0px" });
+    document.querySelectorAll("main section[id]").forEach((s) => sectionObserver.observe(s));
+
+    // Mobile hamburger toggle
+    function setMenu(open) {
+      navLinks.classList.toggle("open", open);
+      navbar.classList.toggle("menu-open", open);
+      navToggle.setAttribute("aria-expanded", open);
+      navToggle.innerHTML = open ? '<i class="fa-solid fa-xmark"></i>' : '<i class="fa-solid fa-bars"></i>';
+    }
+    navToggle.addEventListener("click", () => setMenu(!navLinks.classList.contains("open")));
+    navLinks.querySelectorAll("a").forEach((a) => a.addEventListener("click", () => setMenu(false)));
+
+    /* ======================================================================
+       4. LIGHT / DARK THEME TOGGLE
+       - No saved choice -> follows the system theme (and updates live if
+         the system theme changes).
+       - Clicking the button saves the choice in localStorage.
+       ====================================================================== */
+    const root = document.documentElement;
+    const themeToggle = document.getElementById("themeToggle");
+    const systemDark = window.matchMedia("(prefers-color-scheme: dark)");
+
+    function currentTheme() {
+      return root.getAttribute("data-theme") || (systemDark.matches ? "dark" : "light");
+    }
+    function updateThemeButton() {
+      const dark = currentTheme() === "dark";
+      themeToggle.innerHTML = dark ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
+      themeToggle.setAttribute("aria-label", dark ? "Switch to light theme" : "Switch to dark theme");
+      themeToggle.title = dark ? "Light theme" : "Dark theme";
+    }
+    themeToggle.addEventListener("click", () => {
+      const next = currentTheme() === "dark" ? "light" : "dark";
+      root.setAttribute("data-theme", next);
+      try { localStorage.setItem("theme", next); } catch (e) {}
+      updateThemeButton();
+    });
+    systemDark.addEventListener("change", updateThemeButton);   // only matters when no choice is saved
+    updateThemeButton();
+
+    /* ======================================================================
+       5. MISC: back-to-top button + footer year
+       ====================================================================== */
+    toTop.addEventListener("click", () => window.scrollTo({ top: 0 }));
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
