@@ -3,7 +3,7 @@
 Personal portfolio of **Kiran Babu Athina**, Machine Learning & AI Engineer (M.S. Data Science, Texas A&M).
 Agentic RAG, LLM fine-tuning, multimodal models, and production ML pipelines.
 
-**Live site:** https://portfolio-kiran-13d2.vercel.app
+**Live site:** [kiranbabuathina.com](https://kiranbabuathina.com)
 
 ## Sections
 
@@ -54,7 +54,7 @@ Every section in `index.html` is marked with a `SECTION:` comment.
 
 ## Deployment
 
-Hosted on **Vercel**, connected to this repository. Every push to `main` redeploys the site automatically.
+Hosted on **Vercel** at [kiranbabuathina.com](https://kiranbabuathina.com), connected to this repository. Every push to `main` redeploys the site automatically.
 
 ## Contact
 
