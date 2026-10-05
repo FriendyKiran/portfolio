@@ -210,8 +210,12 @@
     /* ======================================================================
        3. FADE-IN ON SCROLL — elements with .reveal animate in (see JS)
        ====================================================================== */
-    .reveal { opacity: 0; transform: translateY(28px); transition: opacity .8s ease, transform .8s ease; }
-    .reveal.visible { opacity: 1; transform: none; }
+    .reveal {
+      transition: opacity .38s ease-out, transform .38s ease-out,
+                  border-color .3s ease, box-shadow .3s ease, background-color .3s ease;
+    }
+    .reveal:not(.visible) { opacity: 0; transform: translateY(16px); }
+    [hidden] { display: none !important; }
 
     /* ======================================================================
        4. NAVBAR (sticky)
@@ -282,6 +286,13 @@
     }
     .hero-grid { display: grid; grid-template-columns: 1.35fr 1fr; gap: 60px; align-items: center; position: relative; }
 
+    /* Mouse-follow spotlight (position set by JS via --mx / --my) */
+    .hero-spotlight {
+      position: absolute; inset: 0; pointer-events: none; opacity: 0; transition: opacity .4s ease;
+      background: radial-gradient(460px circle at var(--mx, 50%) var(--my, 50%), var(--accent-soft), transparent 70%);
+    }
+    .hero:hover .hero-spotlight { opacity: 1; }
+
     .hero-status {
       display: inline-flex; align-items: center; gap: 10px;
       padding: 7px 14px; border: 1px solid var(--border); border-radius: 999px;
@@ -342,21 +353,41 @@
        7. EXPERIENCE — vertical timeline
        ====================================================================== */
     .timeline { position: relative; padding-left: 36px; }
+    /* Grey track */
     .timeline::before {
       content: ""; position: absolute; left: 8px; top: 6px; bottom: 6px; width: 2px;
-      background: linear-gradient(var(--accent), var(--border) 70%);
+      background: var(--border); border-radius: 2px;
+    }
+    /* Accent line that "draws" down as you scroll (scaleY set by JS) */
+    .timeline-progress {
+      position: absolute; left: 8px; top: 6px; bottom: 6px; width: 2px; border-radius: 2px;
+      background: var(--accent); box-shadow: 0 0 10px var(--accent-glow);
+      transform-origin: top; transform: scaleY(0);
     }
     .tl-item { position: relative; margin-bottom: 30px; }
     .tl-item:last-child { margin-bottom: 0; }
+    /* Dots light up once the line reaches them */
     .tl-dot {
-      position: absolute; left: -36px; top: 30px; width: 18px; height: 18px; border-radius: 50%;
-      background: var(--bg); border: 3px solid var(--accent); box-shadow: 0 0 14px var(--accent-glow);
+      position: absolute; left: -36px; top: 40px; width: 18px; height: 18px; border-radius: 50%;
+      background: var(--bg); border: 3px solid var(--border); transition: all .3s ease;
     }
-    .tl-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; margin-bottom: 4px; }
-    .tl-role { font-size: 1.2rem; font-weight: 600; }
+    .tl-item.passed .tl-dot {
+      border-color: var(--accent); background: var(--accent);
+      box-shadow: 0 0 0 4px var(--accent-soft), 0 0 14px var(--accent-glow);
+    }
+    .tl-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; margin-bottom: 18px; }
+    .tl-id { display: flex; align-items: center; gap: 14px; }
+    /* Company logo thumbnail (falls back to initials if the image fails) */
+    .org-logo {
+      width: 46px; height: 46px; flex-shrink: 0; border-radius: 10px;
+      display: grid; place-items: center; overflow: hidden;
+      background: #ffffff; border: 1px solid var(--border);
+    }
+    .org-logo img { width: 30px; height: 30px; object-fit: contain; }
+    .org-logo.mono::after { content: attr(data-mono); font-size: 0.7rem; font-weight: 700; color: #0f172a; letter-spacing: .02em; }
+    .tl-role { font-size: 1.2rem; font-weight: 600; line-height: 1.3; }
     .tl-date { font-size: 0.85rem; color: var(--accent); background: var(--accent-soft); padding: 4px 12px; border-radius: 999px; white-space: nowrap; }
-    .tl-org { color: var(--muted); font-size: 0.95rem; margin-bottom: 14px; }
-    .tl-org i { margin-right: 6px; }
+    .tl-org { color: var(--muted); font-size: 0.95rem; }
     .tl-list { list-style: none; display: grid; gap: 10px; margin-bottom: 16px; }
     .tl-list li { position: relative; padding-left: 20px; color: var(--muted); font-size: 0.96rem; }
     .tl-list li::before { content: "▹"; position: absolute; left: 0; color: var(--accent); }
@@ -364,9 +395,29 @@
     .tags { display: flex; flex-wrap: wrap; gap: 8px; }
 
     /* ======================================================================
-       8. SKILLS — chip groups
+       8. SKILLS — tabbed chip groups
        ====================================================================== */
+    /* Tabs / filter pills (shared by Skills and Projects) */
+    .pill-bar { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 28px; }
+    .pill {
+      font-family: inherit; font-size: 0.9rem; font-weight: 500; cursor: pointer;
+      padding: 8px 16px; border-radius: 999px;
+      color: var(--muted); background: var(--surface); border: 1px solid var(--border);
+      transition: all .2s ease;
+    }
+    .pill:hover { color: var(--text); border-color: var(--accent); }
+    .pill[aria-pressed="true"], .pill[aria-selected="true"] {
+      color: var(--on-accent); background: var(--accent); border-color: var(--accent);
+      box-shadow: 0 0 18px var(--accent-soft);
+    }
+    .pill .count { opacity: .7; margin-left: 4px; font-size: 0.8rem; }
+
     .skills-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; }
+    .skills-grid:not(.single) .skill-card:last-child { grid-column: 1 / -1; }  /* 5 cards: last one spans */
+    .skills-grid.single .skill-card { grid-column: 1 / -1; }
+    /* Chips pop in one after another when a tab is selected */
+    @keyframes chip-in { from { opacity: 0; transform: translateY(8px) scale(.96); } to { opacity: 1; transform: none; } }
+    .chips.pop .chip { animation: chip-in .3s ease-out both; animation-delay: calc(var(--i, 0) * 22ms); }
     .skill-head { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; }
     .skill-icon {
       width: 44px; height: 44px; border-radius: 10px; display: grid; place-items: center;
@@ -379,14 +430,57 @@
        9. PROJECTS
        ====================================================================== */
     .projects-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
-    .project { display: flex; flex-direction: column; }
-    .project-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
-    .project-icon { font-size: 1.8rem; color: var(--accent); }
+    .card.project { display: flex; flex-direction: column; padding: 0; overflow: hidden; }
+    @keyframes card-in { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+    .project.filter-in { animation: card-in .35s ease-out both; }
+
+    /* Animated preview strip at the top of each card.
+       Animations are paused until the card is hovered (always on for touch). */
+    .project-media {
+      height: 150px; color: var(--accent); overflow: hidden;
+      background:
+        radial-gradient(circle at 70% 30%, var(--accent-soft), transparent 60%),
+        var(--surface-2);
+      border-bottom: 1px solid var(--border);
+    }
+    .project-media svg { width: 100%; height: 100%; display: block; }
+    .project-media video, .project-media img { width: 100%; height: 100%; object-fit: cover; }
+    .project-media * { animation-play-state: paused; }
+    .project:hover .project-media *, .project:focus-within .project-media * { animation-play-state: running; }
+    @media (hover: none) { .project-media * { animation-play-state: running; } }
+
+    /* SVG building blocks */
+    .pm-line  { stroke: currentColor; fill: none; }
+    .pm-faint { stroke: var(--muted); opacity: .35; fill: none; }
+    .pm-dot   { fill: currentColor; }
+    .pm-muted { fill: var(--muted); opacity: .3; }
+    .pm-ink   { fill: var(--text); }
+    @keyframes pm-dash    { to { stroke-dashoffset: -28; } }
+    @keyframes pm-pulse   { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.45); } }
+    @keyframes pm-scan    { to { transform: translateY(90px); } }
+    @keyframes pm-grow    { 0%, 100% { transform: scaleX(1); } 50% { transform: scaleX(.3); } }
+    @keyframes pm-rotate  { to { transform: rotate(360deg); } }
+    @keyframes pm-draw    { 0%, 100% { stroke-dashoffset: 0; } 45% { stroke-dashoffset: var(--len, 160); } }
+    @keyframes pm-transit { from { transform: translateX(-95px); } to { transform: translateX(95px); } }
+    @keyframes pm-wave    { to { transform: translateX(-80px); } }
+    .pm-flow    { stroke-dasharray: 6 8; animation: pm-dash 1s linear infinite; }
+    .pm-pulse   { transform-box: fill-box; transform-origin: center; animation: pm-pulse 1.6s ease-in-out infinite; }
+    .pm-scan    { animation: pm-scan 2.2s ease-in-out infinite alternate; }
+    .pm-grow    { transform-box: fill-box; transform-origin: left center; animation: pm-grow 1.8s ease-in-out infinite; }
+    .pm-rotate  { transform-origin: 160px 75px; animation: pm-rotate 3.5s linear infinite; }
+    .pm-draw    { stroke-dasharray: var(--len, 160); animation: pm-draw 2.6s ease-in-out infinite; }
+    .pm-transit { animation: pm-transit 3.2s linear infinite; }
+    .pm-wave    { animation: pm-wave 1.6s linear infinite; }
+
+    .project-body { display: flex; flex-direction: column; flex: 1; padding: 22px 24px 24px; }
+    .project-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
     .project-kind { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.12em; }
-    .project h3 { font-size: 1.12rem; font-weight: 600; line-height: 1.35; margin-bottom: 10px; }
+    /* Impact callout: the number is the headline */
+    .impact { margin-bottom: 12px; }
+    .impact-num { display: block; font-size: 2.1rem; font-weight: 700; line-height: 1.1; color: var(--accent); letter-spacing: -0.02em; }
+    .impact-lbl { display: block; font-size: 0.85rem; color: var(--text); font-weight: 500; margin-top: 2px; }
+    .project h3 { font-size: 1.1rem; font-weight: 600; line-height: 1.35; margin-bottom: 8px; }
     .project p { color: var(--muted); font-size: 0.93rem; margin-bottom: 16px; flex: 1; }
-    .metric { display: inline-flex; align-items: center; gap: 8px; color: var(--text); font-weight: 600; font-size: 0.9rem; margin-bottom: 16px; }
-    .metric i { color: var(--accent); }
     .center-cta { text-align: center; margin-top: 44px; }
 
     /* ======================================================================
@@ -433,11 +527,31 @@
        12. CONTACT
        ====================================================================== */
     .contact-intro { color: var(--muted); font-size: 1.1rem; max-width: 620px; margin: -24px 0 40px; }
-    .contact-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
-    .contact-card { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; color: var(--text); }
-    .contact-card i { font-size: 1.5rem; color: var(--accent); }
-    .contact-card .lbl { font-size: 0.8rem; color: var(--muted); text-transform: uppercase; letter-spacing: .12em; }
-    .contact-card .val { font-size: 0.95rem; font-weight: 500; word-break: break-word; }
+    .contact-layout { display: grid; grid-template-columns: 1.5fr 1fr; gap: 28px; align-items: start; }
+
+    /* Inline contact form */
+    .contact-form .form-row { display: grid; grid-template-columns: 1fr 1fr; column-gap: 16px; }
+    .field { display: grid; gap: 6px; margin-bottom: 16px; }
+    .field label { font-size: 0.85rem; font-weight: 500; color: var(--muted); }
+    .field input, .field textarea {
+      font: inherit; font-size: 0.97rem; color: var(--text);
+      background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px;
+      padding: 12px 14px; width: 100%; transition: border-color .2s ease, box-shadow .2s ease;
+    }
+    .field textarea { min-height: 140px; resize: vertical; }
+    .field input:focus, .field textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+    .hp-field { position: absolute; left: -9999px; }   /* spam honeypot, hidden from people */
+    .form-foot { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+    .form-status { font-size: 0.9rem; color: var(--muted); }
+    .form-status.ok { color: #22c58b; }
+    .form-status.err { color: #ef5b5b; }
+
+    /* Direct links beside the form */
+    .contact-links { display: grid; gap: 14px; }
+    .contact-card { display: flex; align-items: center; gap: 16px; padding: 18px 20px; color: var(--text); }
+    .contact-card i { font-size: 1.35rem; color: var(--accent); width: 26px; text-align: center; }
+    .contact-card .lbl { display: block; font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: .12em; }
+    .contact-card .val { display: block; font-size: 0.95rem; font-weight: 500; word-break: break-word; }
 
     footer { padding: 30px 0; border-top: 1px solid var(--border); color: var(--muted); font-size: 0.88rem; text-align: center; }
 
@@ -456,7 +570,7 @@
        ====================================================================== */
     @media (max-width: 960px) {
       .projects-grid { grid-template-columns: repeat(2, 1fr); }
-      .contact-grid { grid-template-columns: repeat(2, 1fr); }
+      .contact-layout { grid-template-columns: 1fr; }
       .about-grid { grid-template-columns: 1fr; }
     }
     @media (max-width: 820px) {
@@ -480,7 +594,13 @@
     @media (max-width: 600px) {
       section { padding: 80px 0; }
       .container { padding: 0 16px; }
-      .projects-grid, .contact-grid { grid-template-columns: 1fr; }
+      .projects-grid { grid-template-columns: 1fr; }
+      .contact-form .form-row { grid-template-columns: 1fr; }
+      /* Pill bars scroll sideways instead of wrapping into many rows */
+      .pill-bar { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 6px; margin-right: -16px; scrollbar-width: none; }
+      .pill-bar::-webkit-scrollbar { display: none; }
+      .pill { flex-shrink: 0; }
+      .impact-num { font-size: 1.9rem; }
       .card { padding: 22px; }
       .pub { grid-template-columns: 1fr; gap: 14px; }
       .pub-year { justify-self: start; }
@@ -488,7 +608,7 @@
       .cite-badge .lbl { margin-top: 0; }
       .timeline { padding-left: 28px; }
       .tl-dot { left: -28px; }
-      .timeline::before { left: 7px; }
+      .timeline::before, .timeline-progress { left: 7px; }
 
       /* ---- Mobile typography: keep body text >= ~15px and readable ---- */
       body { line-height: 1.7; }
@@ -501,7 +621,7 @@
       .tl-role { font-size: 1.1rem; }
       .tl-list li, .project p, .pub-desc, .pub-authors, .tl-org, .edu .meta { font-size: 0.97rem; }
       .pub-title { font-size: 1.05rem; }
-      .pub-venue, .metric, .stat-label { font-size: 0.93rem; }
+      .pub-venue, .stat-label { font-size: 0.93rem; }
       .chip { font-size: 0.88rem; padding: 7px 13px; }
       .chip.sm { font-size: 0.8rem; }
       .project-kind, .contact-card .lbl, .cite-badge .lbl { font-size: 0.78rem; }
@@ -555,6 +675,7 @@
          Typing phrases are set in the <script> (TYPING_PHRASES).
          ====================================================================== -->
     <section class="hero" id="home">
+      <div class="hero-spotlight" id="heroSpotlight" aria-hidden="true"></div>
       <div class="container hero-grid">
         <div>
           <div class="hero-status"><span class="pulse"></span> Open to ML Engineer, AI Engineer &amp; Data Scientist roles</div>
@@ -632,16 +753,23 @@
         <h2 class="section-title reveal">Where I've worked</h2>
 
         <div class="timeline">
+          <div class="timeline-progress" id="timelineProgress"></div>
 
           <!-- Role: AISLS Lab -->
           <div class="tl-item reveal">
             <span class="tl-dot"></span>
             <div class="card">
               <div class="tl-head">
-                <h3 class="tl-role">Research Assistant</h3>
+                <div class="tl-id">
+                  <!-- Logo: swap the src for a local file (e.g. logos/tamu.png) if you prefer -->
+                  <span class="org-logo" data-mono="TAMU"><img src="https://www.google.com/s2/favicons?domain=tamu.edu&amp;sz=128" alt="" loading="lazy" /></span>
+                  <div>
+                    <h3 class="tl-role">Research Assistant</h3>
+                    <p class="tl-org">Texas A&amp;M AISLS Lab · College Station, TX</p>
+                  </div>
+                </div>
                 <span class="tl-date">Jun 2025 – Present</span>
               </div>
-              <p class="tl-org"><i class="fa-solid fa-flask"></i>Texas A&amp;M AISLS Lab · College Station, TX</p>
               <ul class="tl-list">
                 <li>Achieved <b>98.7% Recall@5</b> across 3 domain-specific knowledge graphs with an agentic RAG system on TAMU HPC (2× NVIDIA RTX 6000), using a query-routing layer over 3 fine-tuned KG retrievers.</li>
                 <li>Cut general-purpose cloud API calls to <b>zero</b> for precision nutrition queries by fine-tuning <b>Gemma 4 12B</b> with LoRA on food-systems corpora aligned with SDG 2.</li>
@@ -656,35 +784,21 @@
             </div>
           </div>
 
-          <!-- Role: Aggie Research Program (leadership) -->
-          <div class="tl-item reveal">
-            <span class="tl-dot"></span>
-            <div class="card">
-              <div class="tl-head">
-                <h3 class="tl-role">Project Lead</h3>
-                <span class="tl-date">Aug 2025 – May 2026</span>
-              </div>
-              <p class="tl-org"><i class="fa-solid fa-users"></i>Aggie Research Program · Texas A&amp;M University</p>
-              <ul class="tl-list">
-                <li>Led teams of <b>3 undergraduate researchers</b> per project, owning end-to-end execution aligned with faculty research goals.</li>
-                <li>Scoped projects, broke research objectives into weekly tasks, and mentored students in applied ML, data analysis, and research practice.</li>
-                <li>Served as the primary point of accountability, reporting progress, risks, and results to the supervising professor weekly.</li>
-              </ul>
-              <div class="tags">
-                <span class="chip sm">Leadership</span><span class="chip sm">Mentoring</span><span class="chip sm">Research Management</span>
-              </div>
-            </div>
-          </div>
-
           <!-- Role: Animal Science -->
           <div class="tl-item reveal">
             <span class="tl-dot"></span>
             <div class="card">
               <div class="tl-head">
-                <h3 class="tl-role">Graduate Research Assistant</h3>
+                <div class="tl-id">
+                  <!-- Logo: swap the src for a local file (e.g. logos/tamu.png) if you prefer -->
+                  <span class="org-logo" data-mono="TAMU"><img src="https://www.google.com/s2/favicons?domain=tamu.edu&amp;sz=128" alt="" loading="lazy" /></span>
+                  <div>
+                    <h3 class="tl-role">Graduate Research Assistant</h3>
+                    <p class="tl-org">Texas A&amp;M Department of Animal Science · College Station, TX</p>
+                  </div>
+                </div>
                 <span class="tl-date">Jan 2024 – May 2025</span>
               </div>
-              <p class="tl-org"><i class="fa-solid fa-cow"></i>Texas A&amp;M Department of Animal Science · College Station, TX</p>
               <ul class="tl-list">
                 <li>Eliminated Azure OpenAI calls for livestock terminology queries by fine-tuning <b>LLaMA 3 with LoRA/PEFT</b> on a proprietary animal science corpus.</li>
                 <li>Delivered grounded, citation-backed answers with a RAG pipeline on <b>Azure AI Search + Azure OpenAI</b>, validated by faculty review across 3 semesters.</li>
@@ -702,10 +816,16 @@
             <span class="tl-dot"></span>
             <div class="card">
               <div class="tl-head">
-                <h3 class="tl-role">Machine Learning Engineer</h3>
+                <div class="tl-id">
+                  <!-- Logo: swap the src for a local file (e.g. logos/tcs.png) if you prefer -->
+                  <span class="org-logo" data-mono="TCS"><img src="https://www.google.com/s2/favicons?domain=tcs.com&amp;sz=128" alt="" loading="lazy" /></span>
+                  <div>
+                    <h3 class="tl-role">Machine Learning Engineer</h3>
+                    <p class="tl-org">Tata Consultancy Services · Hyderabad, India</p>
+                  </div>
+                </div>
                 <span class="tl-date">Aug 2021 – Jul 2023</span>
               </div>
-              <p class="tl-org"><i class="fa-solid fa-building"></i>Tata Consultancy Services · Hyderabad, India</p>
               <ul class="tl-list">
                 <li>Cut loan processing time by <b>30%</b> with classification models on Azure ML using AutoML-driven model selection and statistical feature engineering.</li>
                 <li>Eliminated <b>30%</b> of manual hardware log triage and sped up issue resolution by <b>18%</b> with a TF-IDF + Random Forest NLP pipeline over 500,000+ daily telecom logs.</li>
@@ -725,10 +845,16 @@
             <span class="tl-dot"></span>
             <div class="card">
               <div class="tl-head">
-                <h3 class="tl-role">Machine Learning Engineer Intern</h3>
+                <div class="tl-id">
+                  <!-- Logo: swap the src for a local file (e.g. logos/tcs.png) if you prefer -->
+                  <span class="org-logo" data-mono="TCS"><img src="https://www.google.com/s2/favicons?domain=tcs.com&amp;sz=128" alt="" loading="lazy" /></span>
+                  <div>
+                    <h3 class="tl-role">Machine Learning Engineer Intern</h3>
+                    <p class="tl-org">Tata Consultancy Services · Hyderabad, India</p>
+                  </div>
+                </div>
                 <span class="tl-date">May 2021 – Jul 2021</span>
               </div>
-              <p class="tl-org"><i class="fa-solid fa-building"></i>Tata Consultancy Services · Hyderabad, India</p>
               <ul class="tl-list">
                 <li>Achieved <b>98.5% fraud classification accuracy</b> on KYC anomaly detection with a multimodal PyTorch model fusing 1D CNN audio and 2D CNN document-image embeddings.</li>
                 <li>Reduced onboarding and handoff time by <b>25%</b> by writing end-to-end documentation of model architectures, assumptions, and evaluation results.</li>
@@ -744,60 +870,47 @@
     </section>
 
     <!-- ======================================================================
-         SECTION: SKILLS (chips grouped by category)
-         Add/remove a <span class="chip">...</span> to edit.
+         SECTION: SKILLS
+         - Tabs: each .skill-card has data-cat matching a tab's data-cat.
          ====================================================================== -->
     <section id="skills">
       <div class="container">
         <p class="section-label reveal">Skills</p>
         <h2 class="section-title reveal">My toolkit</h2>
 
-        <div class="skills-grid">
-          <!-- Languages -->
-          <div class="card reveal">
+        <div class="pill-bar reveal" role="tablist" aria-label="Skill categories" id="skillTabs">
+            <button class="pill" role="tab" aria-selected="true" data-cat="all">All</button>
+            <button class="pill" role="tab" aria-selected="false" data-cat="languages">Languages</button>
+            <button class="pill" role="tab" aria-selected="false" data-cat="ml">ML / AI</button>
+            <button class="pill" role="tab" aria-selected="false" data-cat="frameworks">Frameworks</button>
+            <button class="pill" role="tab" aria-selected="false" data-cat="cloud">Cloud &amp; HPC</button>
+            <button class="pill" role="tab" aria-selected="false" data-cat="tools">Tools &amp; Data</button>
+        </div>
+
+        <div class="skills-grid" id="skillsGrid">
+          <div class="card skill-card reveal" data-cat="languages">
             <div class="skill-head"><div class="skill-icon"><i class="fa-solid fa-code"></i></div><h3>Languages</h3></div>
-            <div class="chips">
-              <span class="chip">Python</span><span class="chip">SQL</span><span class="chip">JavaScript</span>
-              <span class="chip">R</span><span class="chip">C</span>
-            </div>
+            <div class="chips"><span class="chip">Python</span><span class="chip">SQL</span><span class="chip">JavaScript</span><span class="chip">R</span><span class="chip">C</span></div>
           </div>
 
-          <!-- ML / AI -->
-          <div class="card reveal">
+          <div class="card skill-card reveal" data-cat="ml">
             <div class="skill-head"><div class="skill-icon"><i class="fa-solid fa-brain"></i></div><h3>ML / AI</h3></div>
-            <div class="chips">
-              <span class="chip">LLMs</span><span class="chip">RAG</span><span class="chip">Agentic AI</span>
-              <span class="chip">Knowledge Graphs</span><span class="chip">LoRA</span><span class="chip">QLoRA</span>
-              <span class="chip">PEFT</span><span class="chip">Transformers</span><span class="chip">Vision-Language Models</span>
-              <span class="chip">CLIP</span><span class="chip">Prompt Engineering</span><span class="chip">PyTorch</span>
-              <span class="chip">TensorFlow</span><span class="chip">Hugging Face</span><span class="chip">Scikit-learn</span>
-              <span class="chip">LangChain</span><span class="chip">LangGraph</span><span class="chip">FAISS</span>
-              <span class="chip">NLTK</span><span class="chip">XGBoost</span><span class="chip">LightGBM</span>
-              <span class="chip">ARIMA / SARIMA / LSTM</span>
-            </div>
+            <div class="chips"><span class="chip">LLMs</span><span class="chip">RAG</span><span class="chip">Agentic AI</span><span class="chip">Knowledge Graphs</span><span class="chip">LoRA</span><span class="chip">QLoRA</span><span class="chip">PEFT</span><span class="chip">Transformers</span><span class="chip">Vision-Language Models</span><span class="chip">CLIP</span><span class="chip">Prompt Engineering</span><span class="chip">Time Series (ARIMA / SARIMA / LSTM)</span></div>
           </div>
 
-          <!-- Cloud -->
-          <div class="card reveal">
+          <div class="card skill-card reveal" data-cat="frameworks">
+            <div class="skill-head"><div class="skill-icon"><i class="fa-solid fa-layer-group"></i></div><h3>Frameworks</h3></div>
+            <div class="chips"><span class="chip">PyTorch</span><span class="chip">TensorFlow</span><span class="chip">Hugging Face</span><span class="chip">Scikit-learn</span><span class="chip">LangChain</span><span class="chip">LangGraph</span><span class="chip">FAISS</span><span class="chip">NLTK</span><span class="chip">XGBoost</span><span class="chip">LightGBM</span><span class="chip">FastAPI</span><span class="chip">React</span><span class="chip">Streamlit</span></div>
+          </div>
+
+          <div class="card skill-card reveal" data-cat="cloud">
             <div class="skill-head"><div class="skill-icon"><i class="fa-solid fa-cloud"></i></div><h3>Cloud &amp; HPC</h3></div>
-            <div class="chips">
-              <span class="chip">Azure AI Search</span><span class="chip">Azure AI Foundry</span><span class="chip">Azure OpenAI</span>
-              <span class="chip">Azure ML</span><span class="chip">Azure App Service</span><span class="chip">Azure Static Web Apps</span>
-              <span class="chip">Azure Blob Storage</span><span class="chip">AWS S3</span><span class="chip">AWS EC2</span>
-              <span class="chip">AWS SageMaker</span><span class="chip">NVIDIA GPU Clusters</span>
-            </div>
+            <div class="chips"><span class="chip">Azure AI Search</span><span class="chip">Azure AI Foundry</span><span class="chip">Azure OpenAI</span><span class="chip">Azure ML</span><span class="chip">Azure App Service</span><span class="chip">Azure Static Web Apps</span><span class="chip">Azure Blob Storage</span><span class="chip">AWS S3</span><span class="chip">AWS EC2</span><span class="chip">AWS SageMaker</span><span class="chip">NVIDIA GPU Clusters</span></div>
           </div>
 
-          <!-- Tools -->
-          <div class="card reveal">
+          <div class="card skill-card reveal" data-cat="tools">
             <div class="skill-head"><div class="skill-icon"><i class="fa-solid fa-screwdriver-wrench"></i></div><h3>Tools &amp; Data</h3></div>
-            <div class="chips">
-              <span class="chip">Docker</span><span class="chip">Kubernetes</span><span class="chip">CI/CD</span>
-              <span class="chip">Git / GitHub</span><span class="chip">FastAPI</span><span class="chip">React</span>
-              <span class="chip">PySpark</span><span class="chip">Hadoop</span><span class="chip">Streamlit</span>
-              <span class="chip">Tableau</span><span class="chip">PostgreSQL</span><span class="chip">MySQL</span>
-              <span class="chip">MongoDB</span><span class="chip">Redis</span><span class="chip">MQTT</span>
-            </div>
+            <div class="chips"><span class="chip">Docker</span><span class="chip">Kubernetes</span><span class="chip">CI/CD</span><span class="chip">Git / GitHub</span><span class="chip">PySpark</span><span class="chip">Hadoop</span><span class="chip">Tableau</span><span class="chip">PostgreSQL</span><span class="chip">MySQL</span><span class="chip">MongoDB</span><span class="chip">Redis</span><span class="chip">MQTT</span></div>
           </div>
         </div>
       </div>
@@ -805,61 +918,169 @@
 
     <!-- ======================================================================
          SECTION: PROJECTS
-         Copy one ".project" card to add a new project.
+         - Filter: data-tags on each card (ml / web / data / research).
+         - Impact number goes in .impact-num, preview art in .project-media.
          ====================================================================== -->
     <section id="projects">
       <div class="container">
         <p class="section-label reveal">Projects</p>
         <h2 class="section-title reveal">Things I've built</h2>
 
-        <div class="projects-grid">
+        <div class="pill-bar reveal" aria-label="Filter projects" id="projectFilters">
+            <button class="pill" aria-pressed="true" data-filter="all">All<span class="count"></span></button>
+            <button class="pill" aria-pressed="false" data-filter="ml">ML<span class="count"></span></button>
+            <button class="pill" aria-pressed="false" data-filter="web">Web<span class="count"></span></button>
+            <button class="pill" aria-pressed="false" data-filter="data">Data<span class="count"></span></button>
+            <button class="pill" aria-pressed="false" data-filter="research">Research<span class="count"></span></button>
+        </div>
 
-          <article class="card project reveal">
-            <div class="project-top"><i class="fa-solid fa-diagram-project project-icon"></i><span class="project-kind">Research</span></div>
-            <h3>Agentic RAG over Domain Knowledge Graphs</h3>
-            <p>Agentic retrieval system on TAMU HPC with a query-routing layer that sends each question to one of 3 fine-tuned knowledge-graph retrievers.</p>
-            <div class="metric"><i class="fa-solid fa-chart-line"></i>98.7% Recall@5 on held-out eval</div>
-            <div class="tags"><span class="chip sm">Agentic AI</span><span class="chip sm">Knowledge Graphs</span><span class="chip sm">Query Routing</span><span class="chip sm">TAMU HPC</span><span class="chip sm">RTX 6000</span></div>
+        <div class="projects-grid" id="projectsGrid">
+
+          <article class="card project reveal" data-tags="ml research">
+            <!-- Preview: replace the <svg> with <video src="demo.mp4" muted loop playsinline></video> or a GIF <img> -->
+            <div class="project-media">
+              <svg viewBox="0 0 320 150" aria-hidden="true">
+                <g class="pm-faint" stroke-width="1.5">
+                  <line x1="200" y1="30" x2="250" y2="22" /><line x1="200" y1="30" x2="240" y2="55" /><line x1="250" y1="22" x2="240" y2="55" />
+                  <line x1="205" y1="78" x2="265" y2="78" /><line x1="205" y1="78" x2="245" y2="102" /><line x1="265" y1="78" x2="245" y2="102" />
+                  <line x1="200" y1="125" x2="255" y2="130" /><line x1="200" y1="125" x2="280" y2="115" /><line x1="255" y1="130" x2="280" y2="115" />
+                  <line x1="110" y1="75" x2="200" y2="30" /><line x1="110" y1="75" x2="200" y2="125" />
+                </g>
+                <line class="pm-line pm-flow" stroke-width="2" x1="44" y1="75" x2="103" y2="75" />
+                <line class="pm-line pm-flow" stroke-width="2" x1="117" y1="75" x2="205" y2="78" />
+                <g class="pm-muted"><circle cx="200" cy="30" r="5" /><circle cx="250" cy="22" r="5" /><circle cx="240" cy="55" r="5" /><circle cx="200" cy="125" r="5" /><circle cx="255" cy="130" r="5" /><circle cx="280" cy="115" r="5" /></g>
+                <circle class="pm-dot pm-pulse" cx="205" cy="78" r="6" /><circle class="pm-dot pm-pulse" cx="265" cy="78" r="5" style="animation-delay:.2s" /><circle class="pm-dot pm-pulse" cx="245" cy="102" r="5" style="animation-delay:.4s" />
+                <circle class="pm-dot" cx="38" cy="75" r="7" />
+                <rect class="pm-line" stroke-width="2" x="103" y="68" width="14" height="14" transform="rotate(45 110 75)" />
+              </svg>
+            </div>
+            <div class="project-body">
+              <div class="project-top"><span class="project-kind">Research</span></div>
+              <div class="impact"><span class="impact-num">98.7%</span><span class="impact-lbl">Recall@5 on a held-out eval set</span></div>
+              <h3>Agentic RAG over Domain Knowledge Graphs</h3>
+              <p>Agentic retrieval system on TAMU HPC with a query-routing layer that sends each question to one of 3 fine-tuned knowledge-graph retrievers.</p>
+              <div class="tags"><span class="chip sm">Agentic AI</span><span class="chip sm">Knowledge Graphs</span><span class="chip sm">Query Routing</span><span class="chip sm">TAMU HPC</span><span class="chip sm">RTX 6000</span></div>
+            </div>
           </article>
 
-          <article class="card project reveal">
-            <div class="project-top"><i class="fa-solid fa-magnifying-glass-chart project-icon"></i><span class="project-kind">Research</span></div>
-            <h3>Source-Grounded RAG Platform on Azure</h3>
-            <p>FastAPI backend plus React chat frontend indexing 120,000+ document chunks with hybrid BM25 + FAISS retrieval and top-5 source traceability on every answer.</p>
-            <div class="metric"><i class="fa-solid fa-chart-line"></i>95% Hit@5 · 0.925 MRR</div>
-            <div class="tags"><span class="chip sm">FastAPI</span><span class="chip sm">BM25</span><span class="chip sm">FAISS</span><span class="chip sm">React</span><span class="chip sm">Azure</span></div>
+          <article class="card project reveal" data-tags="ml web research">
+            <!-- Preview: replace the <svg> with <video src="demo.mp4" muted loop playsinline></video> or a GIF <img> -->
+            <div class="project-media">
+              <svg viewBox="0 0 320 150" aria-hidden="true">
+                <g class="pm-muted">
+                  <rect x="30" y="24" width="110" height="8" rx="4" /><rect x="30" y="42" width="90" height="8" rx="4" /><rect x="30" y="60" width="104" height="8" rx="4" />
+                  <rect x="30" y="78" width="80" height="8" rx="4" /><rect x="30" y="96" width="100" height="8" rx="4" /><rect x="30" y="114" width="94" height="8" rx="4" />
+                </g>
+                <rect class="pm-scan pm-line" stroke-width="1.5" x="24" y="18" width="122" height="20" rx="6" style="fill: currentColor; fill-opacity: .12" />
+                <line class="pm-line pm-flow" stroke-width="2" x1="160" y1="75" x2="192" y2="75" />
+                <rect class="pm-dot pm-grow" x="205" y="28" width="90" height="10" rx="5" />
+                <rect class="pm-dot pm-grow" x="205" y="48" width="76" height="10" rx="5" style="opacity:.85; animation-delay:.1s" />
+                <rect class="pm-dot pm-grow" x="205" y="68" width="64" height="10" rx="5" style="opacity:.7; animation-delay:.2s" />
+                <rect class="pm-dot pm-grow" x="205" y="88" width="52" height="10" rx="5" style="opacity:.55; animation-delay:.3s" />
+                <rect class="pm-dot pm-grow" x="205" y="108" width="40" height="10" rx="5" style="opacity:.4; animation-delay:.4s" />
+              </svg>
+            </div>
+            <div class="project-body">
+              <div class="project-top"><span class="project-kind">Research</span></div>
+              <div class="impact"><span class="impact-num">95%</span><span class="impact-lbl">Hit@5 · 0.925 MRR on 1,000 expert questions</span></div>
+              <h3>Source-Grounded RAG Platform on Azure</h3>
+              <p>FastAPI backend plus React chat frontend indexing 120,000+ document chunks with hybrid BM25 + FAISS retrieval and top-5 source traceability on every answer.</p>
+              <div class="tags"><span class="chip sm">FastAPI</span><span class="chip sm">BM25</span><span class="chip sm">FAISS</span><span class="chip sm">React</span><span class="chip sm">Azure</span></div>
+            </div>
           </article>
 
-          <article class="card project reveal">
-            <div class="project-top"><i class="fa-solid fa-eye project-icon"></i><span class="project-kind">Healthcare AI</span></div>
-            <h3>Retinal Disease Diagnosis with Vision-Language Models</h3>
-            <p>Fine-tuned MedGemma 4B on paired fundus images and clinical notes for 12-class retinal disease classification, validated on 1,200+ expert-annotated images.</p>
-            <div class="metric"><i class="fa-solid fa-chart-line"></i>91% diagnostic accuracy</div>
-            <div class="tags"><span class="chip sm">MedGemma 4B</span><span class="chip sm">VLMs</span><span class="chip sm">Fine-tuning</span><span class="chip sm">Medical Imaging</span></div>
+          <article class="card project reveal" data-tags="ml research">
+            <!-- Preview: replace the <svg> with <video src="demo.mp4" muted loop playsinline></video> or a GIF <img> -->
+            <div class="project-media">
+              <svg viewBox="0 0 320 150" aria-hidden="true">
+                <circle cx="160" cy="75" r="58" class="pm-dot" style="opacity:.08" />
+                <circle cx="160" cy="75" r="58" class="pm-line" stroke-width="2" />
+                <circle cx="132" cy="70" r="10" class="pm-dot" style="opacity:.4" />
+                <g class="pm-line" stroke-width="2" style="opacity:.5">
+                  <path d="M132 70 C 150 42, 178 36, 204 42" /><path d="M132 70 C 156 96, 184 110, 208 106" />
+                  <path d="M132 70 C 118 46, 122 30, 142 22" /><path d="M132 70 C 114 96, 118 116, 140 128" />
+                </g>
+                <g class="pm-rotate">
+                  <path d="M160 75 L160 17 A58 58 0 0 1 201 34 Z" class="pm-dot" style="opacity:.16" />
+                  <line x1="160" y1="75" x2="160" y2="17" class="pm-line" stroke-width="2" />
+                </g>
+                <circle class="pm-dot pm-pulse" cx="186" cy="94" r="4" /><circle class="pm-dot pm-pulse" cx="176" cy="50" r="3" style="animation-delay:.5s" />
+              </svg>
+            </div>
+            <div class="project-body">
+              <div class="project-top"><span class="project-kind">Healthcare AI</span></div>
+              <div class="impact"><span class="impact-num">91%</span><span class="impact-lbl">diagnostic accuracy across 12 retinal diseases</span></div>
+              <h3>Retinal Disease Diagnosis with Vision-Language Models</h3>
+              <p>Fine-tuned MedGemma 4B on paired fundus images and clinical notes, validated on 1,200+ expert-annotated images.</p>
+              <div class="tags"><span class="chip sm">MedGemma 4B</span><span class="chip sm">VLMs</span><span class="chip sm">Fine-tuning</span><span class="chip sm">Medical Imaging</span></div>
+            </div>
           </article>
 
-          <article class="card project reveal">
-            <div class="project-top"><i class="fa-solid fa-images project-icon"></i><span class="project-kind">Deep Learning</span></div>
-            <h3>CLIP-style Multimodal Contrastive Learning</h3>
-            <p>Dual-encoder ResNet-50 + DistilBERT model trained with NT-Xent and iSogCLR losses using AdamW/RAdam optimizers, benchmarked against baseline CLIP.</p>
-            <div class="metric"><i class="fa-solid fa-chart-line"></i>+17% retrieval (MSCOCO) · +14% zero-shot (ImageNet)</div>
-            <div class="tags"><span class="chip sm">PyTorch</span><span class="chip sm">ResNet-50</span><span class="chip sm">DistilBERT</span><span class="chip sm">Contrastive Learning</span></div>
+          <article class="card project reveal" data-tags="ml">
+            <!-- Preview: replace the <svg> with <video src="demo.mp4" muted loop playsinline></video> or a GIF <img> -->
+            <div class="project-media">
+              <svg viewBox="0 0 320 150" aria-hidden="true">
+                <g class="pm-faint" stroke-width="1"><line x1="82" y1="29" x2="226" y2="58" /><line x1="82" y1="59" x2="226" y2="118" /><line x1="82" y1="119" x2="226" y2="28" /></g>
+                <g class="pm-line pm-draw" stroke-width="2" style="--len:150">
+                  <line x1="82" y1="29" x2="226" y2="28" /><line x1="82" y1="59" x2="226" y2="58" /><line x1="82" y1="89" x2="226" y2="88" /><line x1="82" y1="119" x2="226" y2="118" />
+                </g>
+                <g class="pm-line" stroke-width="2" style="fill: currentColor; fill-opacity: .15">
+                  <rect x="44" y="18" width="36" height="22" rx="4" /><rect x="44" y="48" width="36" height="22" rx="4" /><rect x="44" y="78" width="36" height="22" rx="4" /><rect x="44" y="108" width="36" height="22" rx="4" />
+                </g>
+                <g class="pm-muted">
+                  <rect x="230" y="24" width="52" height="8" rx="4" /><rect x="230" y="54" width="44" height="8" rx="4" /><rect x="230" y="84" width="56" height="8" rx="4" /><rect x="230" y="114" width="40" height="8" rx="4" />
+                </g>
+              </svg>
+            </div>
+            <div class="project-body">
+              <div class="project-top"><span class="project-kind">Deep Learning</span></div>
+              <div class="impact"><span class="impact-num">+17%</span><span class="impact-lbl">image-text retrieval on MSCOCO (+14% zero-shot on ImageNet)</span></div>
+              <h3>CLIP-style Multimodal Contrastive Learning</h3>
+              <p>Dual-encoder ResNet-50 + DistilBERT model trained with NT-Xent and iSogCLR losses using AdamW/RAdam optimizers, benchmarked against baseline CLIP.</p>
+              <div class="tags"><span class="chip sm">PyTorch</span><span class="chip sm">ResNet-50</span><span class="chip sm">DistilBERT</span><span class="chip sm">Contrastive Learning</span></div>
+            </div>
           </article>
 
-          <article class="card project reveal">
-            <div class="project-top"><i class="fa-solid fa-user-astronaut project-icon"></i><span class="project-kind">NASA Space Apps 2025</span></div>
-            <h3>Exoplanet Discovery</h3>
-            <p>Ensemble of Random Forest, XGBoost, LightGBM, Gradient Boosting, and MLP models that classifies Kepler and TESS objects as confirmed exoplanets, candidates, or false positives.</p>
-            <div class="metric"><i class="fa-solid fa-chart-line"></i>96.64% classification accuracy</div>
-            <div class="tags"><span class="chip sm">XGBoost</span><span class="chip sm">LightGBM</span><span class="chip sm">Scikit-learn</span><span class="chip sm">Streamlit</span></div>
+          <article class="card project reveal" data-tags="ml data web">
+            <!-- Preview: replace the <svg> with <video src="demo.mp4" muted loop playsinline></video> or a GIF <img> -->
+            <div class="project-media">
+              <svg viewBox="0 0 320 150" aria-hidden="true">
+                <circle cx="160" cy="52" r="34" class="pm-dot" style="opacity:.12" />
+                <circle cx="160" cy="52" r="24" class="pm-dot" style="opacity:.45" />
+                <g class="pm-transit"><circle cx="160" cy="52" r="6" class="pm-ink" /></g>
+                <line x1="20" y1="132" x2="300" y2="132" class="pm-faint" stroke-width="1" />
+                <polyline class="pm-line pm-draw" stroke-width="2" style="--len:300" points="20,112 132,112 142,124 178,124 188,112 300,112" />
+              </svg>
+            </div>
+            <div class="project-body">
+              <div class="project-top"><span class="project-kind">NASA Space Apps 2025</span></div>
+              <div class="impact"><span class="impact-num">96.64%</span><span class="impact-lbl">classification accuracy on Kepler + TESS data</span></div>
+              <h3>Exoplanet Discovery</h3>
+              <p>Ensemble of Random Forest, XGBoost, LightGBM, Gradient Boosting, and MLP models that classifies Kepler and TESS objects as confirmed exoplanets, candidates, or false positives, deployed as an interactive Streamlit app.</p>
+              <div class="tags"><span class="chip sm">XGBoost</span><span class="chip sm">LightGBM</span><span class="chip sm">Scikit-learn</span><span class="chip sm">Streamlit</span></div>
+            </div>
           </article>
 
-          <article class="card project reveal">
-            <div class="project-top"><i class="fa-solid fa-cow project-icon"></i><span class="project-kind">Research</span></div>
-            <h3>Livestock Digital Twin</h3>
-            <p>Sensor-driven agent-based simulation that ingests live MQTT sensor streams to model per-animal energy and methane dynamics.</p>
-            <div class="metric"><i class="fa-solid fa-chart-line"></i>Minute-level energy tracking · monthly CH₄ forecasts</div>
-            <div class="tags"><span class="chip sm">Python</span><span class="chip sm">Mesa ABM</span><span class="chip sm">MQTT</span><span class="chip sm">Simulation</span></div>
+          <article class="card project reveal" data-tags="data research">
+            <!-- Preview: replace the <svg> with <video src="demo.mp4" muted loop playsinline></video> or a GIF <img> -->
+            <div class="project-media">
+              <svg viewBox="0 0 320 150" aria-hidden="true">
+                <defs><clipPath id="twinClip"><rect x="50" y="0" width="250" height="150" /></clipPath></defs>
+                <circle class="pm-dot pm-pulse" cx="30" cy="40" r="6" /><circle class="pm-dot pm-pulse" cx="30" cy="75" r="6" style="animation-delay:.3s" /><circle class="pm-dot pm-pulse" cx="30" cy="110" r="6" style="animation-delay:.6s" />
+                <g clip-path="url(#twinClip)">
+                  <path class="pm-line pm-wave" stroke-width="2" d="M50 40 q20 -14 40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0" />
+                  <path class="pm-line pm-wave" stroke-width="2" style="opacity:.6; animation-duration:2.2s" d="M50 75 q20 -10 40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0" />
+                  <path class="pm-line pm-wave" stroke-width="2" style="opacity:.35; animation-duration:2.8s" d="M50 110 q20 -16 40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0" />
+                </g>
+              </svg>
+            </div>
+            <div class="project-body">
+              <div class="project-top"><span class="project-kind">Research</span></div>
+              <div class="impact"><span class="impact-num">Minute-level</span><span class="impact-lbl">per-animal energy tracking + monthly CH₄ forecasts</span></div>
+              <h3>Livestock Digital Twin</h3>
+              <p>Sensor-driven agent-based simulation that ingests live MQTT sensor streams to model per-animal energy and methane dynamics.</p>
+              <div class="tags"><span class="chip sm">Python</span><span class="chip sm">Mesa ABM</span><span class="chip sm">MQTT</span><span class="chip sm">Simulation</span></div>
+            </div>
           </article>
 
         </div>
@@ -959,28 +1180,55 @@
 
     <!-- ======================================================================
          SECTION: CONTACT
+         The form opens the visitor's email app with the message pre-filled.
+         To send messages straight to your inbox instead, create a free form at
+         formspree.io and paste its URL into FORM_ENDPOINT in the <script>.
          ====================================================================== -->
     <section id="contact">
       <div class="container">
         <p class="section-label reveal">Contact</p>
         <h2 class="section-title reveal">Let's build something</h2>
         <p class="contact-intro reveal">
-          I'm open to ML Engineer, AI Engineer, and Data Scientist roles. Based in Austin, TX. The fastest way to reach me is by email.
+          I'm open to ML Engineer, AI Engineer, and Data Scientist roles. Based in Austin, TX. Send a note below and I'll get back to you.
         </p>
 
-        <div class="contact-grid">
-          <a class="card contact-card reveal" href="mailto:kiranathina8@gmail.com">
-            <i class="fa-solid fa-envelope"></i><span class="lbl">Email</span><span class="val">kiranathina8@gmail.com</span>
-          </a>
-          <a class="card contact-card reveal" href="https://www.linkedin.com/in/athinakiranbabu" target="_blank" rel="noopener">
-            <i class="fa-brands fa-linkedin"></i><span class="lbl">LinkedIn</span><span class="val">in/athinakiranbabu</span>
-          </a>
-          <a class="card contact-card reveal" href="https://github.com/FriendyKiran" target="_blank" rel="noopener">
-            <i class="fa-brands fa-github"></i><span class="lbl">GitHub</span><span class="val">FriendyKiran</span>
-          </a>
-          <a class="card contact-card reveal" href="https://scholar.google.com/citations?user=wWen3jgAAAAJ&hl=en" target="_blank" rel="noopener">
-            <i class="fa-solid fa-graduation-cap"></i><span class="lbl">Google Scholar</span><span class="val">Kiran Babu Athina</span>
-          </a>
+        <div class="contact-layout">
+          <form class="card contact-form reveal" id="contactForm" novalidate>
+            <div class="form-row">
+              <div class="field">
+                <label for="cf-name">Name</label>
+                <input id="cf-name" name="name" type="text" autocomplete="name" required placeholder="Your name" />
+              </div>
+              <div class="field">
+                <label for="cf-email">Email</label>
+                <input id="cf-email" name="email" type="email" autocomplete="email" required placeholder="you@company.com" />
+              </div>
+            </div>
+            <div class="field">
+              <label for="cf-message">Message</label>
+              <textarea id="cf-message" name="message" required placeholder="Role, team, or what you'd like to talk about"></textarea>
+            </div>
+            <input class="hp-field" type="text" name="_gotcha" tabindex="-1" autocomplete="off" aria-hidden="true" />
+            <div class="form-foot">
+              <button type="submit" class="btn btn-primary"><i class="fa-regular fa-paper-plane"></i> Send message</button>
+              <span class="form-status" id="formStatus" role="status" aria-live="polite"></span>
+            </div>
+          </form>
+
+          <div class="contact-links">
+            <a class="card contact-card reveal" href="mailto:kiranathina8@gmail.com">
+              <i class="fa-solid fa-envelope"></i><span><span class="lbl">Email</span><span class="val">kiranathina8@gmail.com</span></span>
+            </a>
+            <a class="card contact-card reveal" href="https://www.linkedin.com/in/athinakiranbabu" target="_blank" rel="noopener">
+              <i class="fa-brands fa-linkedin"></i><span><span class="lbl">LinkedIn</span><span class="val">in/athinakiranbabu</span></span>
+            </a>
+            <a class="card contact-card reveal" href="https://github.com/FriendyKiran" target="_blank" rel="noopener">
+              <i class="fa-brands fa-github"></i><span><span class="lbl">GitHub</span><span class="val">FriendyKiran</span></span>
+            </a>
+            <a class="card contact-card reveal" href="https://scholar.google.com/citations?user=wWen3jgAAAAJ&hl=en" target="_blank" rel="noopener">
+              <i class="fa-solid fa-graduation-cap"></i><span><span class="lbl">Google Scholar</span><span class="val">Kiran Babu Athina</span></span>
+            </a>
+          </div>
         </div>
       </div>
     </section>
@@ -1054,9 +1302,15 @@
       });
     }, { threshold: 0.12, rootMargin: "0px 0px -40px 0px" });
 
-    document.querySelectorAll(".reveal").forEach((el, i) => {
-      // Small stagger for items that appear together (e.g. grid cards)
-      el.style.transitionDelay = `${(i % 4) * 70}ms`;
+    // Stagger siblings (e.g. cards in a grid) by 60ms each, capped so nothing feels slow.
+    // The delay is removed after the entrance so hover effects stay instant.
+    document.querySelectorAll(".reveal").forEach((el) => {
+      const siblings = [...el.parentElement.children].filter((c) => c.classList.contains("reveal"));
+      const delay = Math.min(siblings.indexOf(el), 5) * 60;
+      if (delay) {
+        el.style.transitionDelay = `${delay}ms`;
+        el.addEventListener("transitionend", () => (el.style.transitionDelay = ""), { once: true });
+      }
       revealObserver.observe(el);
     });
 
@@ -1072,9 +1326,26 @@
       const y = window.scrollY;
       navbar.classList.toggle("scrolled", y > 20);
       toTop.classList.toggle("show", y > 600);
+      updateTimeline();
+    }
+
+    // Experience timeline: the accent line grows to the 60% mark of the viewport,
+    // and each dot lights up once the line passes it.
+    const timeline = document.querySelector(".timeline");
+    const timelineProgress = document.getElementById("timelineProgress");
+    const tlItems = [...document.querySelectorAll(".tl-item")];
+    function updateTimeline() {
+      const rect = timeline.getBoundingClientRect();
+      const mark = window.innerHeight * 0.6;
+      const p = Math.min(1, Math.max(0, (mark - rect.top) / rect.height));
+      timelineProgress.style.transform = `scaleY(${p})`;
+      tlItems.forEach((item) => {
+        const dot = item.querySelector(".tl-dot").getBoundingClientRect();
+        item.classList.toggle("passed", dot.top + dot.height / 2 < mark);
+      });
     }
     window.addEventListener("scroll", onScroll, { passive: true });
-    onScroll();
+    window.addEventListener("resize", onScroll);
 
     // Highlight the nav link for the section currently on screen
     const linkFor = {};
@@ -1134,6 +1405,139 @@
        ====================================================================== */
     toTop.addEventListener("click", () => window.scrollTo({ top: 0 }));
     document.getElementById("year").textContent = new Date().getFullYear();
+    onScroll();   // set initial navbar / timeline state
+
+    /* ======================================================================
+       6. HERO SPOTLIGHT — soft glow that follows the mouse (desktop only)
+       ====================================================================== */
+    const hero = document.getElementById("home");
+    const spotlight = document.getElementById("heroSpotlight");
+    if (window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
+      let frame = null;
+      hero.addEventListener("mousemove", (e) => {
+        if (frame) return;
+        frame = requestAnimationFrame(() => {
+          const r = hero.getBoundingClientRect();
+          spotlight.style.setProperty("--mx", `${e.clientX - r.left}px`);
+          spotlight.style.setProperty("--my", `${e.clientY - r.top}px`);
+          frame = null;
+        });
+      });
+    }
+
+    /* ======================================================================
+       7. SKILL TABS — show one category or all
+       ====================================================================== */
+    const skillTabs = [...document.querySelectorAll("#skillTabs .pill")];
+    const skillsGrid = document.getElementById("skillsGrid");
+    const skillCards = [...skillsGrid.querySelectorAll(".skill-card")];
+    skillCards.forEach((card) => card.querySelectorAll(".chip").forEach((c, i) => c.style.setProperty("--i", i)));
+
+    skillTabs.forEach((tab) => tab.addEventListener("click", () => {
+      const cat = tab.dataset.cat;
+      skillTabs.forEach((t) => t.setAttribute("aria-selected", t === tab));
+      skillsGrid.classList.toggle("single", cat !== "all");
+      skillCards.forEach((card) => {
+        card.hidden = cat !== "all" && card.dataset.cat !== cat;
+        if (!card.hidden) {
+          card.classList.add("visible");
+          const chipsEl = card.querySelector(".chips");
+          chipsEl.classList.remove("pop");
+          void chipsEl.offsetWidth;   // restart the animation
+          chipsEl.classList.add("pop");
+        }
+      });
+    }));
+
+    /* ======================================================================
+       8. PROJECT FILTER — All / ML / Web / Data / Research
+       ====================================================================== */
+    const filterBtns = [...document.querySelectorAll("#projectFilters .pill")];
+    const projectCards = [...document.querySelectorAll("#projectsGrid .project")];
+    filterBtns.forEach((btn) => {
+      const f = btn.dataset.filter;
+      const n = f === "all" ? projectCards.length : projectCards.filter((c) => c.dataset.tags.split(" ").includes(f)).length;
+      btn.querySelector(".count").textContent = n;
+      btn.addEventListener("click", () => {
+        filterBtns.forEach((b) => b.setAttribute("aria-pressed", b === btn));
+        projectCards.forEach((card) => {
+          const show = f === "all" || card.dataset.tags.split(" ").includes(f);
+          card.hidden = !show;
+          if (show) {
+            card.classList.add("visible");
+            card.classList.remove("filter-in");
+            void card.offsetWidth;
+            card.classList.add("filter-in");
+          }
+        });
+      });
+    });
+
+    // Optional: real <video> previews play on hover and pause on leave
+    projectCards.forEach((card) => {
+      const video = card.querySelector(".project-media video");
+      if (!video) return;
+      card.addEventListener("mouseenter", () => video.play().catch(() => {}));
+      card.addEventListener("mouseleave", () => video.pause());
+    });
+
+    /* ======================================================================
+       9. COMPANY LOGOS — fall back to initials if an image can't load
+       ====================================================================== */
+    document.querySelectorAll(".org-logo img").forEach((img) => {
+      const fallback = () => { img.parentElement.classList.add("mono"); img.remove(); };
+      if (img.complete && img.naturalWidth === 0) fallback();
+      else img.addEventListener("error", fallback);
+    });
+
+    /* ======================================================================
+       10. CONTACT FORM
+       FORM_ENDPOINT empty  -> opens the visitor's email app, pre-filled.
+       FORM_ENDPOINT set    -> sends in the background (e.g. Formspree:
+                               "https://formspree.io/f/your-id").
+       ====================================================================== */
+    const FORM_ENDPOINT = "";
+    const CONTACT_EMAIL = "kiranathina8@gmail.com";
+    const form = document.getElementById("contactForm");
+    const formStatus = document.getElementById("formStatus");
+
+    function setStatus(msg, kind) {
+      formStatus.textContent = msg;
+      formStatus.className = `form-status ${kind || ""}`;
+    }
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (!form.reportValidity()) return;
+      const data = Object.fromEntries(new FormData(form));
+      if (data._gotcha) return;   // bot filled the hidden field
+
+      if (!FORM_ENDPOINT) {
+        const subject = `Portfolio contact from ${data.name}`;
+        const body = `${data.message}\n\n${data.name}\n${data.email}`;
+        window.location.href = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+        setStatus("Opening your email app…", "ok");
+        return;
+      }
+
+      const btn = form.querySelector("button[type=submit]");
+      btn.disabled = true;
+      setStatus("Sending…");
+      try {
+        const res = await fetch(FORM_ENDPOINT, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Accept: "application/json" },
+          body: JSON.stringify(data),
+        });
+        if (!res.ok) throw new Error(res.status);
+        form.reset();
+        setStatus("Thanks! Your message was sent.", "ok");
+      } catch (err) {
+        setStatus(`Couldn't send. Please email ${CONTACT_EMAIL} directly.`, "err");
+      } finally {
+        btn.disabled = false;
+      }
+    });
   </script>
 </body>
 </html>
