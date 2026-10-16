@@ -28,8 +28,9 @@ Plain **HTML, CSS, and JavaScript** in a single `index.html` file. There are no 
 ## Files
 
 ```
-index.html         the whole site: markup, <style>, and <script>
-formal image.jpg   profile photo used in the hero
+index.html                the whole site: markup, <style>, and <script>
+formal image.jpg          profile photo used in the hero
+Kiran_Athina_Resume.pdf   resume, downloadable from the navbar, hero, and contact section
 ```
 
 ## Run locally
