@@ -794,7 +794,7 @@
               </div>
               <ul class="tl-list">
                 <li>Engineered a triple-retriever RAG pipeline (KG semantic, Qdrant dense, BM25) with Reciprocal Rank Fusion and cross-encoder reranking, achieving <b>95% faithfulness</b> and <b>89% answer accuracy</b> on a 10,000-question domain eval set.</li>
-                <li>Boosted context recall from <b>0.38 → 0.94</b> by constructing a domain knowledge graph of <b>7,405 entities</b> and <b>11,249 relationships</b> from 30 research papers, using a multi-pass Qwen3 14B extraction pipeline with <b>93%</b> verbatim quote verification.</li>
+                <li>Boosted context recall from <b>0.38 → 0.94</b> by constructing a domain knowledge graph of <b>7,405 entities</b> and <b>11,249 relationships</b> from 235 research papers, using a multi-pass Qwen3 14B extraction pipeline with <b>93%</b> verbatim quote verification.</li>
                 <li>Developed an agentic retriever with 8 targeted graph and passage search actions over a Kuzu graph database and embedded Qdrant index, achieving <b>91% gold-page retrieval</b> and <b>86% gold-quote recall</b>, measured deterministically against source PDFs.</li>
                 <li>Designed a React frontend with clickable <b>[F#]/[P#] citations</b> that open the exact source PDF page with the retrieved passage highlighted and per-citation retrieval scores shown, for full end-to-end citation transparency.</li>
               </ul>
